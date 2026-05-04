@@ -1,110 +1,118 @@
 import { useState, useEffect, useRef } from 'react';
 
 // Ease in-out cubic
-const easeInOutCubic = (t) =>
-  t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+const ease = (t) => t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+
+// Layout constants — fora do componente para não re-criar a cada render
+const BAR_H  = 66;   // altura da barra branca
+const BR     = 26;   // raio da bolha
+const ABOVE  = BR;   // espaço acima da barra para a bolha
+const TOTAL_H = BAR_H + ABOVE;
+
+// Notch — sutil e elegante
+const NW = 28;   // meia-largura do notch
+const ND = 13;   // profundidade do notch
+const SW = 22;   // largura do ombro (transição suave)
 
 export function BubbleNav({ activeId, items, onNav }) {
-  const containerRef = useRef(null);
-  const [width, setWidth] = useState(0);
-  const [bubbleX, setBubbleX] = useState(null);
-  const currentXRef = useRef(null);
-  const animRef = useRef(null);
+  const ref = useRef(null);
+  const [W, setW] = useState(0);
 
-  // Measure container width on mount and resize
+  // cx animado (só X, Y é fixo → sem jitter vertical)
+  const [cx, setCx] = useState(null);
+  const cxRef   = useRef(null);   // valor atual durante animação
+  const rafRef  = useRef(null);
+  const prevActiveRef = useRef(activeId);
+
+  // Medir largura
   useEffect(() => {
-    const measure = () => {
-      if (containerRef.current) setWidth(containerRef.current.offsetWidth);
-    };
+    const measure = () => ref.current && setW(ref.current.offsetWidth);
     measure();
     const ro = new ResizeObserver(measure);
-    if (containerRef.current) ro.observe(containerRef.current);
+    if (ref.current) ro.observe(ref.current);
     return () => ro.disconnect();
   }, []);
 
   const activeIndex = items.findIndex(i => i.id === activeId);
-  const tabW = width > 0 ? width / items.length : 0;
-  const targetX = tabW * activeIndex + tabW / 2;
+  const tabW  = W > 0 ? W / items.length : 0;
+  const toX   = tabW * activeIndex + tabW / 2;
 
-  // Animate bubbleX → targetX
+  // Inicializa sem animação na primeira medição
   useEffect(() => {
-    if (width === 0) return;
-
-    // First render: snap to position
-    if (currentXRef.current === null) {
-      currentXRef.current = targetX;
-      setBubbleX(targetX);
-      return;
+    if (W > 0 && cxRef.current === null) {
+      cxRef.current = toX;
+      setCx(toX);
     }
+  }, [W, toX]);
 
-    const from = currentXRef.current;
-    const to = targetX;
-    if (Math.abs(from - to) < 0.5) return;
+  // Anima apenas quando a aba realmente muda (não no resize)
+  useEffect(() => {
+    if (cxRef.current === null || W === 0) return;
+    if (prevActiveRef.current === activeId) return; // mesma aba → nada
+    prevActiveRef.current = activeId;
 
-    cancelAnimationFrame(animRef.current);
-    const t0 = performance.now();
-    const dur = 420;
+    const from = cxRef.current;
+    const to   = toX;
+
+    cancelAnimationFrame(rafRef.current);
+    const t0  = performance.now();
+    const dur = 400;
 
     const tick = (now) => {
-      const p = Math.min((now - t0) / dur, 1);
-      const val = from + (to - from) * easeInOutCubic(p);
-      currentXRef.current = val;
-      setBubbleX(val);
-      if (p < 1) animRef.current = requestAnimationFrame(tick);
-      else currentXRef.current = to;
+      const p   = Math.min((now - t0) / dur, 1);
+      const val = from + (to - from) * ease(p);
+      cxRef.current = val;
+      setCx(val);
+      if (p < 1) rafRef.current = requestAnimationFrame(tick);
+      else cxRef.current = to;
     };
 
-    animRef.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(animRef.current);
-  }, [targetX, width]);
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [activeId]); // depende SÓ de activeId — não de toX ou W
 
-  // Dimensions
-  const BAR_H = 70;       // white bar height
-  const BUBBLE_R = 28;    // bubble radius
-  const NOTCH_R = 34;     // notch cutout radius (slightly bigger than bubble)
-  const TOTAL_H = BAR_H + BUBBLE_R + 4; // container total height
+  // Atualiza cx ao redimensionar (sem animação)
+  useEffect(() => {
+    if (cxRef.current !== null && W > 0) {
+      cxRef.current = toX;
+      setCx(toX);
+    }
+  }, [W]); // eslint-disable-line
 
-  const cx = bubbleX ?? targetX;
-  const W = width || 480;
+  // ── SVG path: barra branca com notch côncavo suave ──────────────────────
+  const currentCx = cx ?? toX;
 
-  // Build SVG path for white bar with circular notch at cx
-  // The notch is a smooth concave arc centered at cx, at the top of the bar
-  const shoulder = 20; // horizontal padding around notch for smooth curve entry
-  const notchDepth = NOTCH_R - 6; // how deep the notch goes (vertical)
+  const lx   = currentCx - NW;
+  const rx   = currentCx + NW;
+  const lFlat = Math.max(0, lx - SW);
+  const rFlat = Math.min(W, rx + SW);
 
-  const lx = cx - NOTCH_R;         // left edge of arc
-  const rx = cx + NOTCH_R;         // right edge of arc
-  const lFlat = lx - shoulder;     // flat starts here
-  const rFlat = rx + shoulder;     // flat ends here
-  const arcBottom = notchDepth;    // SVG y of notch deepest point (relative to bar top)
-
-  const barPath = [
+  // Dois arcos bezier simétricos criam o U côncavo
+  const barPath = W > 0 ? [
     `M 0 0`,
-    `L ${Math.max(0, lFlat)} 0`,
-    // Left shoulder — cubic bezier from flat into the notch
-    `C ${lFlat + shoulder * 0.6} 0 ${lx} ${arcBottom * 0.5} ${lx} ${arcBottom}`,
-    // Arc across the notch bottom (counter-clockwise, so it curves DOWN)
-    `A ${NOTCH_R} ${NOTCH_R} 0 0 0 ${rx} ${arcBottom}`,
-    // Right shoulder — cubic bezier from notch back to flat
-    `C ${rx} ${arcBottom * 0.5} ${Math.min(W, rFlat - shoulder * 0.6)} 0 ${Math.min(W, rFlat)} 0`,
+    `L ${lFlat} 0`,
+    // ombro esquerdo → fundo do notch
+    `C ${lFlat + SW * 0.55} 0 ${lx} ${ND * 0.55} ${lx} ${ND}`,
+    // fundo arredondado (S-curve simétrica)
+    `C ${lx} ${ND + 4} ${rx} ${ND + 4} ${rx} ${ND}`,
+    // fundo → ombro direito
+    `C ${rx} ${ND * 0.55} ${rFlat - SW * 0.55} 0 ${rFlat} 0`,
     `L ${W} 0`,
     `L ${W} ${BAR_H}`,
     `L 0 ${BAR_H}`,
     `Z`,
-  ].join(' ');
+  ].join(' ') : '';
 
-  // Bubble vertical position: center sits at the notch center (top of bar)
-  const bubbleTop = BUBBLE_R + 4 - BUBBLE_R; // = 4px from container top
-  // Actually: container top is BUBBLE_R+4 above bar top.
-  // Bar top in container = BUBBLE_R + 4
-  // Bubble center should be at bar top → bubble top = (BUBBLE_R+4) - BUBBLE_R = 4px
+  // ── Posição fixa da bolha (só X muda, Y é constante) ────────────────────
+  const bubbleTop  = ABOVE - BR;          // = 0 → colado ao topo do container
+  const bubbleLeft = currentCx - BR;
 
   const ActiveIcon = items[activeIndex]?.icon;
 
   return (
     <div
-      ref={containerRef}
-      className="bubble-nav-hide"
+      ref={ref}
+      className="bubble-nav"
       style={{
         position: 'fixed',
         bottom: 0, left: 0, right: 0,
@@ -112,11 +120,10 @@ export function BubbleNav({ activeId, items, onNav }) {
         maxWidth: 480,
         margin: '0 auto',
         zIndex: 30,
-        display: 'block',
       }}
     >
-      {/* White bar with notch (SVG) */}
-      {width > 0 && (
+      {/* Barra SVG com notch */}
+      {W > 0 && (
         <svg
           width={W}
           height={BAR_H}
@@ -125,22 +132,22 @@ export function BubbleNav({ activeId, items, onNav }) {
             position: 'absolute',
             bottom: 0, left: 0,
             overflow: 'visible',
-            filter: 'drop-shadow(0 -4px 18px rgba(15,23,42,0.09))',
+            filter: 'drop-shadow(0 -2px 12px rgba(15,23,42,0.07))',
           }}
         >
           <path d={barPath} fill="white" />
         </svg>
       )}
 
-      {/* Floating bubble */}
-      {cx > 0 && (
+      {/* Bolha flutuante */}
+      {currentCx > 0 && (
         <div
           style={{
             position: 'absolute',
-            left: cx - BUBBLE_R,
-            top: 4,
-            width: BUBBLE_R * 2,
-            height: BUBBLE_R * 2,
+            top: bubbleTop,
+            left: bubbleLeft,
+            width:  BR * 2,
+            height: BR * 2,
             borderRadius: '50%',
             background: 'var(--primary)',
             display: 'flex',
@@ -148,14 +155,15 @@ export function BubbleNav({ activeId, items, onNav }) {
             justifyContent: 'center',
             color: '#fff',
             zIndex: 2,
-            boxShadow: '0 8px 24px rgba(15,118,110,0.38), 0 2px 8px rgba(15,118,110,0.22)',
+            boxShadow: '0 6px 20px rgba(15,118,110,0.34)',
+            willChange: 'left',
           }}
         >
-          {ActiveIcon && <ActiveIcon size={22} />}
+          {ActiveIcon && <ActiveIcon size={21} />}
         </div>
       )}
 
-      {/* Tab buttons */}
+      {/* Ícones das abas */}
       <div
         style={{
           position: 'absolute',
@@ -163,7 +171,6 @@ export function BubbleNav({ activeId, items, onNav }) {
           height: BAR_H,
           display: 'grid',
           gridTemplateColumns: `repeat(${items.length}, 1fr)`,
-          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         }}
       >
         {items.map((item, i) => {
@@ -186,9 +193,8 @@ export function BubbleNav({ activeId, items, onNav }) {
                 fontWeight: 500,
                 fontFamily: 'inherit',
                 WebkitTapHighlightColor: 'transparent',
-                // Hide the active tab's content since the bubble covers it
                 opacity: isActive ? 0 : 1,
-                transition: 'opacity 200ms ease',
+                transition: 'opacity 180ms ease',
                 pointerEvents: isActive ? 'none' : 'auto',
               }}
             >
