@@ -6,8 +6,8 @@ export const Avatar = ({ nome, size = 40, ring = false }) => (
   <div
     style={{
       width: size, height: size, borderRadius: '50%',
-      background: '#F1F5F9', flexShrink: 0,
-      boxShadow: ring ? '0 0 0 3px #fff, 0 0 0 4px #E2E8F0' : 'none',
+      background: 'var(--line-soft)', flexShrink: 0,
+      boxShadow: ring ? '0 0 0 3px var(--surface), 0 0 0 4px var(--line)' : 'none',
       overflow: 'hidden'
     }}
   >
@@ -25,21 +25,8 @@ export const StatusBadge = ({ status, size = 'md' }) => {
   const m = STATUS_META[status];
   const isSm = size === 'sm';
   return (
-    <span
-      style={{
-        display: 'inline-flex', alignItems: 'center', gap: 6,
-        padding: isSm ? '2px 8px' : '4px 10px',
-        borderRadius: 9999,
-        background: m.bg, color: m.fg,
-        fontSize: isSm ? 11 : 12, fontWeight: 600,
-        letterSpacing: 0.1, lineHeight: 1.4,
-        whiteSpace: 'nowrap'
-      }}
-    >
-      <span style={{
-        width: 6, height: 6, borderRadius: '50%',
-        background: m.dot, flexShrink: 0
-      }} />
+    <span className={`vale-status-badge ${m.cls} ${isSm ? 'sm' : ''}`}>
+      <span className="vale-status-dot" style={{ background: m.dot }} />
       {m.label}
     </span>
   );
@@ -69,7 +56,7 @@ export const ToastProvider = ({ children }) => {
           <div key={t.id}
             className="vale-toast"
             style={{
-              background: '#0F172A',
+              background: 'var(--ink)',
               color: '#fff', padding: '12px 16px', borderRadius: 10,
               fontSize: 14, fontWeight: 500,
               display: 'flex', alignItems: 'center', gap: 10,
@@ -113,7 +100,7 @@ export const Sheet = ({ open, onClose, children, title, fullHeight = false }) =>
             padding: '4px 20px 12px',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between'
           }}>
-            <h3 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: '#0F172A' }}>{title}</h3>
+            <h3 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: 'var(--ink)' }}>{title}</h3>
             <button onClick={onClose} className="vale-icon-btn" aria-label="Fechar">
               <IconX size={18}/>
             </button>
@@ -135,15 +122,15 @@ export const EmptyState = ({ icon: Icon = IconInbox, title, body, action }) => (
   }}>
     <div style={{
       width: 72, height: 72, borderRadius: 20,
-      background: 'linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%)',
-      border: '1px solid #E2E8F0',
+      background: 'var(--line-soft)',
+      border: '1px solid var(--line)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      color: '#94A3B8', marginBottom: 4
+      color: 'var(--subtle)', marginBottom: 4
     }}>
       <Icon size={32}/>
     </div>
-    <div style={{ fontSize: 16, fontWeight: 600, color: '#0F172A' }}>{title}</div>
-    {body && <div style={{ fontSize: 14, color: '#64748B', maxWidth: 280, lineHeight: 1.5 }}>{body}</div>}
+    <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--ink)' }}>{title}</div>
+    {body && <div style={{ fontSize: 14, color: 'var(--muted)', maxWidth: 280, lineHeight: 1.5 }}>{body}</div>}
     {action}
   </div>
 );

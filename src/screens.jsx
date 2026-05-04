@@ -91,7 +91,7 @@ export const Dashboard = ({ employees, requests, onNav, onOpenRequest, onOpenEmp
           <div className="vale-row" style={{ marginBottom: 10 }}>
             <div style={{
               width: 32, height: 32, borderRadius: 8,
-              background: '#FEF3C7', color: '#92400E',
+              background: 'var(--chip-warn-bg)', color: 'var(--chip-warn-fg)',
               display: 'flex', alignItems: 'center', justifyContent: 'center'
             }}>
               <IconClock size={16}/>
@@ -107,7 +107,7 @@ export const Dashboard = ({ employees, requests, onNav, onOpenRequest, onOpenEmp
           <div className="vale-row" style={{ marginBottom: 10 }}>
             <div style={{
               width: 32, height: 32, borderRadius: 8,
-              background: '#D1FAE5', color: '#065F46',
+              background: 'var(--chip-ok-bg)', color: 'var(--chip-ok-fg)',
               display: 'flex', alignItems: 'center', justifyContent: 'center'
             }}>
               <IconCheck size={16}/>

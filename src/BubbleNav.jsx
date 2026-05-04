@@ -1,30 +1,39 @@
 import { useState, useEffect, useRef } from 'react';
 
-// Ease in-out cubic
-const ease = (t) => t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+const BAR_H  = 66;
+const BR     = 26;
+const TOTAL_H = BAR_H + BR;
+const NW = 28;
+const ND = 13;
+const SW = 22;
 
-// Layout constants — fora do componente para não re-criar a cada render
-const BAR_H  = 66;   // altura da barra branca
-const BR     = 26;   // raio da bolha
-const ABOVE  = BR;   // espaço acima da barra para a bolha
-const TOTAL_H = BAR_H + ABOVE;
-
-// Notch — sutil e elegante
-const NW = 28;   // meia-largura do notch
-const ND = 13;   // profundidade do notch
-const SW = 22;   // largura do ombro (transição suave)
+function buildPath(cx, W) {
+  if (!cx || W <= 0) return '';
+  const lx    = cx - NW;
+  const rx    = cx + NW;
+  const lFlat = Math.max(0, lx - SW);
+  const rFlat = Math.min(W, rx + SW);
+  return [
+    `M 0 0`,
+    `L ${lFlat} 0`,
+    `C ${lFlat + SW * 0.55} 0 ${lx} ${ND * 0.55} ${lx} ${ND}`,
+    `C ${lx} ${ND + 4} ${rx} ${ND + 4} ${rx} ${ND}`,
+    `C ${rx} ${ND * 0.55} ${rFlat - SW * 0.55} 0 ${rFlat} 0`,
+    `L ${W} 0`,
+    `L ${W} ${BAR_H}`,
+    `L 0 ${BAR_H}`,
+    `Z`,
+  ].join(' ');
+}
 
 export function BubbleNav({ activeId, items, onNav }) {
   const ref = useRef(null);
   const [W, setW] = useState(0);
+  const [live, setLive] = useState(false);
+  // Ícone exibido e sua opacidade — cross-fade no meio da viagem
+  const [displayId, setDisplayId] = useState(activeId);
+  const [iconVisible, setIconVisible] = useState(true);
 
-  // cx animado (só X, Y é fixo → sem jitter vertical)
-  const [cx, setCx] = useState(null);
-  const cxRef   = useRef(null);   // valor atual durante animação
-  const rafRef  = useRef(null);
-  const prevActiveRef = useRef(activeId);
-
-  // Medir largura
   useEffect(() => {
     const measure = () => ref.current && setW(ref.current.offsetWidth);
     measure();
@@ -33,81 +42,33 @@ export function BubbleNav({ activeId, items, onNav }) {
     return () => ro.disconnect();
   }, []);
 
+  // Duplo rAF: liga transitions só após o primeiro paint
+  useEffect(() => {
+    if (W > 0 && !live) {
+      const id = requestAnimationFrame(() =>
+        requestAnimationFrame(() => setLive(true))
+      );
+      return () => cancelAnimationFrame(id);
+    }
+  }, [W, live]);
+
+  // Cross-fade: esconde ícone → troca → mostra (no meio da viagem da bolha)
+  useEffect(() => {
+    if (!live) { setDisplayId(activeId); return; }
+    setIconVisible(false);
+    const t = setTimeout(() => {
+      setDisplayId(activeId);
+      setIconVisible(true);
+    }, 180);
+    return () => clearTimeout(t);
+  }, [activeId]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const activeIndex = items.findIndex(i => i.id === activeId);
-  const tabW  = W > 0 ? W / items.length : 0;
-  const toX   = tabW * activeIndex + tabW / 2;
-
-  // Inicializa sem animação na primeira medição
-  useEffect(() => {
-    if (W > 0 && cxRef.current === null) {
-      cxRef.current = toX;
-      setCx(toX);
-    }
-  }, [W, toX]);
-
-  // Anima apenas quando a aba realmente muda (não no resize)
-  useEffect(() => {
-    if (cxRef.current === null || W === 0) return;
-    if (prevActiveRef.current === activeId) return; // mesma aba → nada
-    prevActiveRef.current = activeId;
-
-    const from = cxRef.current;
-    const to   = toX;
-
-    cancelAnimationFrame(rafRef.current);
-    const t0  = performance.now();
-    const dur = 400;
-
-    const tick = (now) => {
-      const p   = Math.min((now - t0) / dur, 1);
-      const val = from + (to - from) * ease(p);
-      cxRef.current = val;
-      setCx(val);
-      if (p < 1) rafRef.current = requestAnimationFrame(tick);
-      else cxRef.current = to;
-    };
-
-    rafRef.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafRef.current);
-  }, [activeId]); // depende SÓ de activeId — não de toX ou W
-
-  // Atualiza cx ao redimensionar (sem animação)
-  useEffect(() => {
-    if (cxRef.current !== null && W > 0) {
-      cxRef.current = toX;
-      setCx(toX);
-    }
-  }, [W]); // eslint-disable-line
-
-  // ── SVG path: barra branca com notch côncavo suave ──────────────────────
-  const currentCx = cx ?? toX;
-
-  const lx   = currentCx - NW;
-  const rx   = currentCx + NW;
-  const lFlat = Math.max(0, lx - SW);
-  const rFlat = Math.min(W, rx + SW);
-
-  // Dois arcos bezier simétricos criam o U côncavo
-  const barPath = W > 0 ? [
-    `M 0 0`,
-    `L ${lFlat} 0`,
-    // ombro esquerdo → fundo do notch
-    `C ${lFlat + SW * 0.55} 0 ${lx} ${ND * 0.55} ${lx} ${ND}`,
-    // fundo arredondado (S-curve simétrica)
-    `C ${lx} ${ND + 4} ${rx} ${ND + 4} ${rx} ${ND}`,
-    // fundo → ombro direito
-    `C ${rx} ${ND * 0.55} ${rFlat - SW * 0.55} 0 ${rFlat} 0`,
-    `L ${W} 0`,
-    `L ${W} ${BAR_H}`,
-    `L 0 ${BAR_H}`,
-    `Z`,
-  ].join(' ') : '';
-
-  // ── Posição fixa da bolha (só X muda, Y é constante) ────────────────────
-  const bubbleTop  = ABOVE - BR;          // = 0 → colado ao topo do container
-  const bubbleLeft = currentCx - BR;
-
-  const ActiveIcon = items[activeIndex]?.icon;
+  const tabW = W > 0 ? W / items.length : 0;
+  const cx   = tabW * activeIndex + tabW / 2;
+  const barPath   = buildPath(cx, W);
+  const DisplayIcon = items.find(i => i.id === displayId)?.icon;
+  const TR = live ? '0.42s cubic-bezier(0.4, 0, 0.2, 1)' : 'none';
 
   return (
     <div
@@ -128,24 +89,28 @@ export function BubbleNav({ activeId, items, onNav }) {
           width={W}
           height={BAR_H}
           viewBox={`0 0 ${W} ${BAR_H}`}
-          style={{
-            position: 'absolute',
-            bottom: 0, left: 0,
-            overflow: 'visible',
-            filter: 'drop-shadow(0 -2px 12px rgba(15,23,42,0.07))',
-          }}
+          className="bubble-nav-svg"
+          style={{ position: 'absolute', bottom: 0, left: 0, overflow: 'visible' }}
         >
-          <path d={barPath} fill="white" />
+          <path
+            d={barPath}
+            fill="var(--surface)"
+            style={{
+              d: barPath ? `path('${barPath}')` : undefined,
+              transition: `d ${TR}`,
+            }}
+          />
         </svg>
       )}
 
-      {/* Bolha flutuante */}
-      {currentCx > 0 && (
+      {/* Bolha — transform: translateX (compositor puro, zero layout) */}
+      {W > 0 && (
         <div
           style={{
             position: 'absolute',
-            top: bubbleTop,
-            left: bubbleLeft,
+            top: 0,
+            left: 0,
+            transform: `translateX(${cx - BR}px)`,
             width:  BR * 2,
             height: BR * 2,
             borderRadius: '50%',
@@ -156,10 +121,17 @@ export function BubbleNav({ activeId, items, onNav }) {
             color: '#fff',
             zIndex: 2,
             boxShadow: '0 6px 20px rgba(15,118,110,0.34)',
-            willChange: 'left',
+            transition: `transform ${TR}`,
+            willChange: 'transform',
           }}
         >
-          {ActiveIcon && <ActiveIcon size={21} />}
+          <div style={{
+            opacity: iconVisible ? 1 : 0,
+            transition: 'opacity 120ms ease',
+            display: 'flex',
+          }}>
+            {DisplayIcon && <DisplayIcon size={21} />}
+          </div>
         </div>
       )}
 
@@ -173,7 +145,7 @@ export function BubbleNav({ activeId, items, onNav }) {
           gridTemplateColumns: `repeat(${items.length}, 1fr)`,
         }}
       >
-        {items.map((item, i) => {
+        {items.map((item) => {
           const isActive = item.id === activeId;
           return (
             <button
@@ -194,7 +166,7 @@ export function BubbleNav({ activeId, items, onNav }) {
                 fontFamily: 'inherit',
                 WebkitTapHighlightColor: 'transparent',
                 opacity: isActive ? 0 : 1,
-                transition: 'opacity 180ms ease',
+                transition: 'opacity 220ms ease',
                 pointerEvents: isActive ? 'none' : 'auto',
               }}
             >

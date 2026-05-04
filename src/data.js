@@ -78,8 +78,8 @@ export const relativeTime = (iso) => {
 };
 
 export const STATUS_META = {
-  pendente: { label: 'Pendente', bg: '#FEF3C7', fg: '#92400E', dot: '#F59E0B' },
-  aprovado: { label: 'Aprovado', bg: '#D1FAE5', fg: '#065F46', dot: '#10B981' },
-  pago:     { label: 'Pago',     bg: '#DBEAFE', fg: '#1E40AF', dot: '#3B82F6' },
-  negado:   { label: 'Negado',   bg: '#FEE2E2', fg: '#991B1B', dot: '#EF4444' }
+  pendente: { label: 'Pendente', cls: 'status-warn', dot: '#F59E0B' },
+  aprovado: { label: 'Aprovado', cls: 'status-ok',   dot: '#10B981' },
+  pago:     { label: 'Pago',     cls: 'status-blue',  dot: '#3B82F6' },
+  negado:   { label: 'Negado',   cls: 'status-red',   dot: '#EF4444' }
 };

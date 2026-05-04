@@ -1,5 +1,8 @@
 /* Vale management app — global styles */
 :root {
+  color-scheme: light dark;
+
+  /* Light tokens (default) */
   --primary: #0F766E;
   --primary-600: #0D6963;
   --primary-50: #F0FDFA;
@@ -15,6 +18,27 @@
   --shadow-sm: 0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
   --shadow-md: 0 4px 12px rgba(15,23,42,0.08);
   --shadow-lg: 0 12px 32px rgba(15,23,42,0.12);
+}
+
+/* Dark theme tokens */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: #14B8A6;
+    --primary-600: #0D9488;
+    --primary-50: #042F2E;
+    --primary-100: #134E4A;
+    --ink: #F1F5F9;
+    --text: #CBD5E1;
+    --muted: #94A3B8;
+    --subtle: #64748B;
+    --line: #1E293B;
+    --line-soft: #0F172A;
+    --bg: #0B1120;
+    --surface: #111827;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+    --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
+  }
 }
 
 * { box-sizing: border-box; }
@@ -67,7 +91,7 @@ input, textarea, select { font-family: inherit; }
 /* Topbar */
 .vale-topbar {
   position: sticky; top: 0; z-index: 20;
-  background: rgba(248, 250, 252, 0.85);
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
   backdrop-filter: saturate(160%) blur(12px);
   -webkit-backdrop-filter: saturate(160%) blur(12px);
   padding: 14px 20px 10px;
@@ -277,7 +301,7 @@ input, textarea, select { font-family: inherit; }
 /* Sticky form footer */
 .vale-form-footer {
   position: sticky; bottom: 0;
-  background: linear-gradient(to top, var(--surface) 70%, rgba(255,255,255,0));
+  background: linear-gradient(to top, var(--surface) 70%, color-mix(in srgb, var(--surface) 0%, transparent));
   padding: 16px 20px calc(16px + env(safe-area-inset-bottom, 0));
   border-top: 1px solid var(--line);
 }
@@ -303,7 +327,7 @@ input, textarea, select { font-family: inherit; }
 .vale-sheet-full { max-height: 92vh; height: 92vh; }
 .vale-sheet-handle {
   width: 36px; height: 4px; border-radius: 2px;
-  background: #CBD5E1;
+  background: var(--subtle);
   margin: 8px auto 12px;
 }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -314,7 +338,7 @@ input, textarea, select { font-family: inherit; }
 
 /* Skeleton */
 .vale-skeleton {
-  background: linear-gradient(90deg, #F1F5F9 0%, #E2E8F0 50%, #F1F5F9 100%);
+  background: linear-gradient(90deg, var(--line-soft) 0%, var(--line) 50%, var(--line-soft) 100%);
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
 }
@@ -473,3 +497,51 @@ input, textarea, select { font-family: inherit; }
 .vale-grow { flex: 1; min-width: 0; }
 .vale-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .vale-divider { height: 1px; background: var(--line); }
+
+/* Status badges */
+.vale-status-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 9999px;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.1px; line-height: 1.4;
+  white-space: nowrap;
+}
+.vale-status-badge.sm { padding: 2px 8px; font-size: 11px; }
+.vale-status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.vale-status-badge.status-warn { background: var(--chip-warn-bg); color: var(--chip-warn-fg); }
+.vale-status-badge.status-ok   { background: var(--chip-ok-bg);   color: var(--chip-ok-fg);   }
+.vale-status-badge.status-blue { background: var(--chip-blue-bg); color: var(--chip-blue-fg); }
+.vale-status-badge.status-red  { background: var(--chip-red-bg);  color: var(--chip-red-fg);  }
+
+/* BubbleNav SVG drop shadow — dark mode aware */
+.bubble-nav-svg {
+  filter: drop-shadow(0 -2px 12px rgba(15,23,42,0.08));
+}
+@media (prefers-color-scheme: dark) {
+  .bubble-nav-svg {
+    filter: drop-shadow(0 -2px 16px rgba(0,0,0,0.5));
+  }
+}
+
+/* Status icon chips — semantic colors adapted for dark */
+:root {
+  --chip-warn-bg: #FEF3C7;
+  --chip-warn-fg: #92400E;
+  --chip-ok-bg:   #D1FAE5;
+  --chip-ok-fg:   #065F46;
+  --chip-red-bg:  #FEE2E2;
+  --chip-red-fg:  #991B1B;
+  --chip-blue-bg: #DBEAFE;
+  --chip-blue-fg: #1E40AF;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --chip-warn-bg: #451A03;
+    --chip-warn-fg: #FCD34D;
+    --chip-ok-bg:   #052E16;
+    --chip-ok-fg:   #6EE7B7;
+    --chip-red-bg:  #450A0A;
+    --chip-red-fg:  #FCA5A5;
+    --chip-blue-bg: #1E3A5F;
+    --chip-blue-fg: #93C5FD;
+  }
+}
