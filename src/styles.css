@@ -1,0 +1,469 @@
+/* Vale management app — global styles */
+:root {
+  --primary: #0F766E;
+  --primary-600: #0D6963;
+  --primary-50: #F0FDFA;
+  --primary-100: #CCFBF1;
+  --ink: #0F172A;
+  --text: #1E293B;
+  --muted: #64748B;
+  --subtle: #94A3B8;
+  --line: #E2E8F0;
+  --line-soft: #F1F5F9;
+  --bg: #F8FAFC;
+  --surface: #FFFFFF;
+  --shadow-sm: 0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
+  --shadow-md: 0 4px 12px rgba(15,23,42,0.08);
+  --shadow-lg: 0 12px 32px rgba(15,23,42,0.12);
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-feature-settings: 'cv11', 'ss01';
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button { font-family: inherit; cursor: pointer; border: none; background: none; padding: 0; }
+input, textarea, select { font-family: inherit; }
+
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* App shell layouts */
+.vale-app {
+  min-height: 100vh;
+  display: flex;
+  background: var(--bg);
+}
+
+/* ---- Mobile (default) ---- */
+.vale-shell {
+  flex: 1;
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--bg);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.vale-content {
+  padding-bottom: 96px;
+  flex: 1;
+}
+
+/* Topbar */
+.vale-topbar {
+  position: sticky; top: 0; z-index: 20;
+  background: rgba(248, 250, 252, 0.85);
+  backdrop-filter: saturate(160%) blur(12px);
+  -webkit-backdrop-filter: saturate(160%) blur(12px);
+  padding: 14px 20px 10px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid transparent;
+  transition: border-color 160ms ease;
+}
+.vale-topbar.scrolled { border-bottom-color: var(--line); }
+.vale-topbar h1 { margin: 0; font-size: 22px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+.vale-topbar-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+.vale-icon-btn {
+  width: 40px; height: 40px; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--text); background: var(--surface);
+  border: 1px solid var(--line);
+  transition: background 160ms ease, transform 120ms ease;
+}
+.vale-icon-btn:hover { background: var(--line-soft); }
+.vale-icon-btn:active { transform: scale(0.95); }
+.vale-icon-btn-ghost { background: transparent; border-color: transparent; }
+.vale-icon-btn-ghost:hover { background: var(--line-soft); }
+
+/* Bottom nav */
+.vale-bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--line);
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0));
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  z-index: 30;
+  max-width: 480px;
+  margin: 0 auto;
+}
+.vale-nav-item {
+  height: 56px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px;
+  color: var(--subtle);
+  font-size: 11px; font-weight: 500;
+  border-radius: 10px;
+  transition: color 160ms ease, background 160ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.vale-nav-item:hover { background: var(--line-soft); }
+.vale-nav-item.active { color: var(--primary); }
+
+/* FAB */
+.vale-fab {
+  position: fixed;
+  right: 20px;
+  bottom: calc(80px + env(safe-area-inset-bottom, 0));
+  z-index: 35;
+  width: 56px; height: 56px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 20px rgba(15,118,110,0.32), 0 2px 6px rgba(15,118,110,0.18);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+.vale-fab:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(15,118,110,0.36), 0 4px 8px rgba(15,118,110,0.18); }
+.vale-fab:active { transform: scale(0.94); }
+
+/* Cards */
+.vale-card {
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+}
+.vale-card-clickable {
+  transition: transform 120ms ease, border-color 160ms ease, box-shadow 160ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.vale-card-clickable:hover { border-color: #CBD5E1; box-shadow: var(--shadow-md); }
+.vale-card-clickable:active { transform: scale(0.99); }
+
+/* Stat number */
+.vale-stat-num {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.vale-stat-num-lg {
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+.vale-stat-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Filter chips */
+.vale-chips {
+  display: flex; gap: 8px;
+  padding: 4px 20px 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-snap-type: x proximity;
+}
+.vale-chips::-webkit-scrollbar { display: none; }
+.vale-chip {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border-radius: 9999px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  transition: all 160ms ease;
+  scroll-snap-align: start;
+}
+.vale-chip:hover { background: var(--line-soft); }
+.vale-chip.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
+/* Buttons */
+.vale-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 160ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.vale-btn-primary {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(15,118,110,0.2);
+}
+.vale-btn-primary:hover { background: var(--primary-600); }
+.vale-btn-primary:active { transform: scale(0.98); }
+.vale-btn-primary:disabled {
+  background: #CBD5E1; color: #fff; cursor: not-allowed; box-shadow: none;
+}
+.vale-btn-ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+.vale-btn-ghost:hover { background: var(--line-soft); }
+.vale-btn-link {
+  background: transparent;
+  color: var(--primary);
+  height: auto;
+  padding: 0;
+}
+.vale-btn-block { width: 100%; }
+
+/* Inputs */
+.vale-field { display: flex; flex-direction: column; gap: 6px; }
+.vale-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.vale-input {
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 16px;
+  color: var(--ink);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+  width: 100%;
+}
+.vale-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(15,118,110,0.12);
+}
+.vale-textarea {
+  padding: 12px 14px;
+  min-height: 96px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+/* Sticky form footer */
+.vale-form-footer {
+  position: sticky; bottom: 0;
+  background: linear-gradient(to top, var(--surface) 70%, rgba(255,255,255,0));
+  padding: 16px 20px calc(16px + env(safe-area-inset-bottom, 0));
+  border-top: 1px solid var(--line);
+}
+
+/* Bottom sheet */
+.vale-sheet-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 100;
+  display: flex; align-items: flex-end; justify-content: center;
+  animation: fadeIn 200ms ease;
+}
+.vale-sheet {
+  background: var(--surface);
+  width: 100%;
+  max-width: 480px;
+  max-height: 80vh;
+  border-radius: 20px 20px 0 0;
+  padding: 8px 0 calc(env(safe-area-inset-bottom, 0));
+  display: flex; flex-direction: column;
+  animation: slideUp 280ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.vale-sheet-full { max-height: 92vh; height: 92vh; }
+.vale-sheet-handle {
+  width: 36px; height: 4px; border-radius: 2px;
+  background: #CBD5E1;
+  margin: 8px auto 12px;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+.vale-toast { animation: toastIn 240ms cubic-bezier(0.32, 0.72, 0, 1); }
+@keyframes toastIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* Skeleton */
+.vale-skeleton {
+  background: linear-gradient(90deg, #F1F5F9 0%, #E2E8F0 50%, #F1F5F9 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+/* Page transitions */
+.vale-screen {
+  animation: screenIn 280ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+@keyframes screenIn {
+  from { opacity: 0; transform: translateX(8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Pull to refresh indicator */
+.vale-ptr {
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  padding: 8px 0;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.vale-ptr-spin { animation: spin 800ms linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Timeline */
+.vale-timeline { position: relative; padding-left: 0; }
+.vale-timeline-line {
+  position: absolute;
+  left: 19px; top: 14px; bottom: 14px;
+  width: 2px;
+  background: var(--line);
+}
+.vale-timeline-item {
+  position: relative;
+  padding-left: 48px;
+  padding-bottom: 18px;
+}
+.vale-timeline-dot {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  z-index: 1;
+}
+
+/* Frequency strip */
+.vale-freq-strip {
+  display: flex; gap: 3px; align-items: flex-end; height: 40px;
+}
+.vale-freq-bar {
+  flex: 1;
+  background: var(--primary-100);
+  border-radius: 2px;
+  min-height: 4px;
+  transition: background 160ms ease;
+}
+.vale-freq-bar.has-data { background: var(--primary); }
+
+/* ---- Desktop sidebar ---- */
+.vale-sidebar {
+  display: none;
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+  padding: 24px 16px;
+  flex-direction: column;
+  gap: 4px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+.vale-sidebar-brand {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 8px 24px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 16px;
+}
+.vale-sidebar-logo {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px;
+  letter-spacing: 0.02em;
+}
+.vale-sidebar-name { font-weight: 700; color: var(--ink); font-size: 15px; }
+.vale-sidebar-org { font-size: 11px; color: var(--muted); }
+
+.vale-sidebar-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 14px; font-weight: 500;
+  transition: all 160ms ease;
+}
+.vale-sidebar-item:hover { background: var(--line-soft); color: var(--text); }
+.vale-sidebar-item.active {
+  background: var(--primary-50);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+@media (min-width: 1024px) {
+  .vale-app {
+    background: var(--bg);
+  }
+  .vale-sidebar { display: flex; }
+  .vale-shell {
+    max-width: none;
+    flex: 1;
+    margin: 0;
+  }
+  .vale-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 32px 48px;
+    width: 100%;
+  }
+  .vale-topbar {
+    background: transparent;
+    backdrop-filter: none;
+    padding: 28px 32px 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .vale-topbar.scrolled { border-bottom-color: transparent; }
+  .vale-topbar h1 { font-size: 28px; }
+  .vale-bottom-nav { display: none; }
+  .vale-fab {
+    bottom: 32px;
+    right: 32px;
+  }
+  .vale-content { padding-bottom: 48px; }
+  .vale-chips { padding-left: 0; padding-right: 0; }
+  .vale-stat-num-lg { font-size: 48px; }
+  .vale-sheet-backdrop { align-items: center; }
+  .vale-sheet {
+    max-width: 520px;
+    border-radius: 16px;
+    margin: 0 16px;
+    max-height: 85vh;
+  }
+}
+
+/* Utility */
+.vale-row { display: flex; align-items: center; gap: 12px; }
+.vale-stack { display: flex; flex-direction: column; }
+.vale-grow { flex: 1; min-width: 0; }
+.vale-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vale-divider { height: 1px; background: var(--line); }
