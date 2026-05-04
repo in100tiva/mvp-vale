@@ -55,7 +55,7 @@ input, textarea, select { font-family: inherit; }
 }
 
 .vale-content {
-  padding-bottom: 96px;
+  padding-bottom: 116px; /* space for bubble nav + FAB */
   flex: 1;
 }
 
@@ -445,6 +445,8 @@ input, textarea, select { font-family: inherit; }
   .vale-topbar.scrolled { border-bottom-color: transparent; }
   .vale-topbar h1 { font-size: 28px; }
   .vale-bottom-nav { display: none; }
+  /* Hide bubble nav on desktop */
+  .bubble-nav-hide { display: none; }
   .vale-fab {
     bottom: 32px;
     right: 32px;

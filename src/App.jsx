@@ -7,6 +7,7 @@ import {
 import { Avatar, Sheet, ToastProvider } from './ui.jsx';
 import { Dashboard, PedidosList, PerfilFuncionario, FuncionariosList } from './screens.jsx';
 import { NovoPedido, NovoFuncionario, RequestDetail } from './forms.jsx';
+import { BubbleNav } from './BubbleNav.jsx';
 import './styles.css';
 
 const NAV = [
@@ -192,16 +193,11 @@ function AppInner() {
         </button>
       )}
 
-      <nav className="vale-bottom-nav">
-        {NAV.map(n => (
-          <button key={n.id}
-                  className={`vale-nav-item ${activeNav === n.id ? 'active' : ''}`}
-                  onClick={() => goNav(n.id)}>
-            <n.icon size={22}/>
-            <span>{n.label}</span>
-          </button>
-        ))}
-      </nav>
+      <BubbleNav
+        activeId={activeNav}
+        items={NAV}
+        onNav={goNav}
+      />
 
       <Sheet open={novoPedidoOpen} onClose={() => setNovoPedidoOpen(false)} fullHeight>
         <NovoPedido
