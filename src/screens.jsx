@@ -52,7 +52,7 @@ export const Dashboard = ({ employees, requests, onNav, onOpenRequest, onOpenEmp
     <div className="vale-screen" style={{ padding: '0 20px' }}>
       {/* Hero stat */}
       <div style={{
-        background: 'linear-gradient(135deg, #0F766E 0%, #0D6963 100%)',
+        background: 'linear-gradient(135deg, var(--primary-600) 0%, var(--primary) 100%)',
         borderRadius: 16,
         padding: '20px 22px',
         color: '#fff',
@@ -150,7 +150,7 @@ export const Dashboard = ({ employees, requests, onNav, onOpenRequest, onOpenEmp
           >
             <div style={{
               width: 24, height: 24, borderRadius: 999,
-              background: i === 0 ? '#0F766E' : 'var(--line-soft)',
+              background: i === 0 ? 'var(--primary)' : 'var(--line-soft)',
               color: i === 0 ? '#fff' : 'var(--muted)',
               fontSize: 12, fontWeight: 700,
               display: 'flex', alignItems: 'center', justifyContent: 'center',

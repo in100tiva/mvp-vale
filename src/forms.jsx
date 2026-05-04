@@ -482,8 +482,8 @@ export const RequestDetail = ({ request, employee, onClose, onUpdateStatus, onOp
                     onClick={() => { onUpdateStatus(request.id, s); onClose(); }}
                     className="vale-btn vale-btn-block"
                     style={{
-                      background: s === 'negado' ? '#FEE2E2' : 'var(--primary)',
-                      color: s === 'negado' ? '#991B1B' : '#fff'
+                      background: s === 'negado' ? 'var(--chip-red-bg)' : 'var(--primary)',
+                      color: s === 'negado' ? 'var(--chip-red-fg)' : '#fff'
                     }}>
               {label}
             </button>
