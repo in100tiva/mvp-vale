@@ -1,14 +1,17 @@
-# Vale — Controle de Adiantamentos
+# Vale — Controle de Adiantamentos + Folha de Ponto
 
 ## What This Is
 
-Aplicação web mobile-first para gestão de pedidos de adiantamento salarial ("vale") em pequenas e médias empresas. A gestora (persona "Marina") visualiza um dashboard com totais do mês, pendências, aprovados e ranking de funcionários, e despacha aprovações pelo celular. Funcionários enviam pedidos pelo mesmo app.
+Aplicação web mobile-first para gestão de RH em pequenas e médias empresas. Centraliza duas operações que hoje vivem em planilhas separadas:
 
-Stack: React 18 + Vite + CSS puro (sem framework UI), deploy estático na Vercel.
+1. **Vales (adiantamentos salariais)** — funcionários pedem, a gestora aprova/nega/marca como pago.
+2. **Folha de ponto** — a gestora registra entrada, almoço, saída e faltas dos funcionários (modelo gestor-registra, não funcionário-bate-ponto).
+
+Persona principal: "Marina", coordenadora de RH. Stack: React 18 + Vite + CSS puro (sem framework UI), tema dark como padrão, deploy estático na Vercel.
 
 ## Core Value
 
-A gestora consegue **aprovar ou negar pedidos de vale do celular em segundos**, com contexto suficiente (quem pediu, quanto, quando, padrão histórico) para decidir sem abrir planilha. O app tem que parecer aplicativo nativo, não site responsivo.
+A gestora resolve **vale e folha de ponto do celular em segundos**, sem abrir planilha. App parece aplicativo nativo (bottom nav animada com bolha, FAB speed-dial, bottom sheets, calendário visual mensal), não site responsivo.
 
 ## Context
 
@@ -34,6 +37,7 @@ A gestora consegue **aprovar ou negar pedidos de vale do celular em segundos**, 
 - [ ] **THEME-02**: nenhum hardcode `#fff`/`rgba(255,…)`/hex claro permanece em componentes — tudo via tokens CSS
 - [ ] **THEME-03**: gradiente teal do hero, barras de gráfico semanal e estados de toast permanecem visualmente vibrantes em dark real
 - [ ] **THEME-04**: smoke test visual em pelo menos 2 navegadores mobile reais antes de marcar como resolvido
+- [ ] **PONTO-01..06**: folha de ponto completa — lista geral, calendário do funcionário, bottom sheet de registro, abas no perfil, cards no dashboard, mocks consistentes (ver REQUIREMENTS.md)
 
 ### Out of Scope (este marco)
 
@@ -50,6 +54,9 @@ A gestora consegue **aprovar ou negar pedidos de vale do celular em segundos**, 
 | Não migrar para Tailwind/shadcn neste marco | Bug é de tokens CSS, não de arquitetura de styling. Refator é distração | — Pending |
 | Usar `color-scheme: dark` explícito como sinal canônico para o navegador | Documentação MDN e relatos de campo (Samsung Internet, Chrome 96+) confirmam que essa é a forma de desativar o auto-darkening | — Pending |
 | MVP fica client-side, persistência em `localStorage` (sem backend, sem auth) | Banco ainda não decidido. Para demonstração, dados mockados + persistência local são suficientes para o stakeholder interagir e validar a UX. Backend volta ao escopo após aprovação | — Implemented (Phase 1.1) |
+| Folha de ponto registrada pela gestora (modelo gestor-bate-ponto), não pelo funcionário | Mantém o app como ferramenta única de RH. Reaproveita o cadastro de funcionários existente. Coerente com o fluxo de Vales (gestora aprova) | — Implemented (Phase 3) |
+| Tema dark é o default absoluto do app — `prefers-color-scheme: light` é ignorado, light só via `[data-theme="light"]` futuro toggle | Para a demo o stakeholder vê sempre a marca (teal vibrante sobre slate-blue). Resolve definitivamente o auto-darkening do mobile (não há mais "tema light" pro browser tentar darkenizar) | — Implemented (Phase 3) |
+| Bottom nav mantém o BubbleNav animado existente — não troca pelo mock do handoff zip | UX já refinada (notch, cross-fade de ícone, transição da bolha). Substituir por nav padrão regrediria a sensação "nativa". Apenas troca os ITENS: "Eu" sai (vai pra avatar do topbar), "Ponto" entra | — Implemented (Phase 3) |
 
 ## Evolution
 
