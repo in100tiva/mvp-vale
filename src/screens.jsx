@@ -1,20 +1,49 @@
 import { useState, useMemo } from 'react';
-import { TODAY, fmtBRL, fmtDate, fmtDateLong, relativeTime } from './data.js';
+import {
+  TODAY, fmtBRL, fmtDate, fmtDateLong, relativeTime,
+  dateKey, isWeekend, calcWorked, minsToHuman, timeToMins
+} from './data.js';
 import {
   IconWallet, IconClock, IconCheck, IconUsers, IconFileText,
   IconBriefcase, IconBuilding, IconChevronLeft, IconChevronRight,
-  IconSearch, IconRefresh, IconPlus
+  IconSearch, IconRefresh, IconPlus, IconAlert, IconArrowUp, IconArrowDown,
+  IconCalendar
 } from './icons.jsx';
 import { Avatar, StatusBadge, EmptyState, FreqDot, useToast } from './ui.jsx';
+import { PontoCalendar, PontoCalendarLegend } from './ponto.jsx';
 
 // ---------- Dashboard ----------
-export const Dashboard = ({ employees, requests, onNav, onOpenRequest, onOpenEmployee }) => {
+export const Dashboard = ({ employees, requests, ponto = [], onNav, onOpenRequest, onOpenEmployee }) => {
   const monthStart = new Date(2026, 4, 1);
   const monthRequests = requests.filter(r => new Date(r.data) >= monthStart);
 
   const totalMes = monthRequests.reduce((s, r) => s + r.valor, 0);
   const pendentes = monthRequests.filter(r => r.status === 'pendente').length;
   const aprovados = monthRequests.filter(r => r.status === 'aprovado' || r.status === 'pago').length;
+
+  // Ponto stats — pendentes hoje + faltas no mês com variação vs mês anterior
+  const today = new Date(TODAY);
+  const todayKey = dateKey(today);
+  const isToday = !isWeekend(today);
+  const pontoToday = ponto.filter(p => p.date === todayKey);
+  const pontoPendingToday = isToday ? Math.max(employees.length - pontoToday.length, 0) : 0;
+
+  const monthFaltas = ponto.filter(p => {
+    if (!p.falta) return false;
+    const d = new Date(p.date + 'T12:00:00');
+    return d >= monthStart && d <= today;
+  }).length;
+
+  const prevMonthStart = new Date(2026, 3, 1);
+  const prevMonthEnd = new Date(2026, 4, 0);
+  const prevFaltas = ponto.filter(p => {
+    if (!p.falta) return false;
+    const d = new Date(p.date + 'T12:00:00');
+    return d >= prevMonthStart && d <= prevMonthEnd;
+  }).length;
+  const faltasDelta = prevFaltas === 0
+    ? null
+    : Math.round(((monthFaltas - prevFaltas) / prevFaltas) * 100);
 
   const counts = {};
   monthRequests.forEach(r => { counts[r.employeeId] = (counts[r.employeeId] || 0) + 1; });
@@ -115,6 +144,60 @@ export const Dashboard = ({ employees, requests, onNav, onOpenRequest, onOpenEmp
           </div>
           <div className="vale-stat-num tabular">{aprovados}</div>
           <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>Aprovados</div>
+        </button>
+      </div>
+
+      {/* Ponto stats — Pontos pendentes hoje / Faltas no mês */}
+      <div className="vale-grid-stats" style={{
+        display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16
+      }}>
+        <button className="vale-card vale-card-clickable"
+                onClick={() => onNav('ponto')}
+                style={{ padding: 16, textAlign: 'left' }}>
+          <div className="vale-row" style={{ marginBottom: 10 }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: 8,
+              background: 'var(--chip-blue-bg)', color: 'var(--chip-blue-fg)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}>
+              <IconClock size={16}/>
+            </div>
+          </div>
+          <div className="vale-stat-num tabular">{pontoPendingToday}</div>
+          <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
+            {isToday ? 'Pontos pendentes hoje' : 'Sem expediente hoje'}
+          </div>
+        </button>
+
+        <button className="vale-card vale-card-clickable"
+                onClick={() => onNav('ponto')}
+                style={{ padding: 16, textAlign: 'left' }}>
+          <div className="vale-row" style={{ marginBottom: 10 }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: 8,
+              background: 'var(--chip-red-bg)', color: 'var(--chip-red-fg)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}>
+              <IconAlert size={16}/>
+            </div>
+          </div>
+          <div className="vale-stat-num tabular">{monthFaltas}</div>
+          <div style={{
+            fontSize: 13, color: 'var(--muted)', marginTop: 4,
+            display: 'flex', alignItems: 'center', gap: 6
+          }}>
+            <span>Faltas no mês</span>
+            {faltasDelta !== null && faltasDelta !== 0 && (
+              <span className="tabular" style={{
+                display: 'inline-flex', alignItems: 'center', gap: 2,
+                fontSize: 11, fontWeight: 600,
+                color: faltasDelta > 0 ? 'var(--status-err-dot)' : 'var(--status-ok-dot)'
+              }}>
+                {faltasDelta > 0 ? <IconArrowUp size={10}/> : <IconArrowDown size={10}/>}
+                {Math.abs(faltasDelta)}%
+              </span>
+            )}
+          </div>
         </button>
       </div>
 
@@ -354,7 +437,9 @@ export const PedidosList = ({ employees, requests, initialFilter = 'todos', onOp
 };
 
 // ---------- Perfil funcionário ----------
-export const PerfilFuncionario = ({ employee, requests, onBack, onOpenRequest }) => {
+export const PerfilFuncionario = ({ employee, requests, ponto = [], onBack, onOpenRequest, onDayClick }) => {
+  const [tab, setTab] = useState('vales'); // 'vales' | 'ponto'
+
   const reqs = requests.filter(r => r.employeeId === employee.id)
     .sort((a, b) => new Date(b.data) - new Date(a.data));
 
@@ -402,8 +487,20 @@ export const PerfilFuncionario = ({ employee, requests, onBack, onOpenRequest })
             </div>
           </div>
         </div>
+
+        <div className="vale-tabs" style={{ marginTop: 20, marginBottom: 0 }}>
+          <button className={`vale-tab ${tab === 'vales' ? 'active' : ''}`}
+                  onClick={() => setTab('vales')}>Vales</button>
+          <button className={`vale-tab ${tab === 'ponto' ? 'active' : ''}`}
+                  onClick={() => setTab('ponto')}>Ponto</button>
+        </div>
       </div>
 
+      {tab === 'ponto' && (
+        <PerfilPontoTab employee={employee} ponto={ponto} onDayClick={onDayClick}/>
+      )}
+
+      {tab === 'vales' && (
       <div style={{ padding: '20px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 20 }}>
           <div className="vale-card" style={{ padding: 14 }}>
@@ -493,6 +590,89 @@ export const PerfilFuncionario = ({ employee, requests, onBack, onOpenRequest })
           </div>
         )}
       </div>
+      )}
+    </div>
+  );
+};
+
+// ---------- Aba Ponto dentro do Perfil Funcionário ----------
+const PerfilPontoTab = ({ employee, ponto, onDayClick }) => {
+  const today = new Date(TODAY);
+  const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+  const monthDate = monthStart;
+
+  const empPonto = ponto.filter(p => p.employeeId === employee.id);
+  const monthRecs = empPonto.filter(p => {
+    const d = new Date(p.date + 'T12:00:00');
+    return d.getMonth() === monthStart.getMonth() && d.getFullYear() === monthStart.getFullYear();
+  });
+
+  const totalMins = monthRecs.reduce((s, r) => s + calcWorked(r), 0);
+  const monthFaltas = monthRecs.filter(r => r.falta).length;
+  const monthAtrasos = monthRecs.filter(r => r.status === 'partial').length;
+  const entradas = monthRecs.filter(r => r.entrada).map(r => timeToMins(r.entrada));
+  const avgEntrada = entradas.length
+    ? Math.round(entradas.reduce((a, b) => a + b, 0) / entradas.length)
+    : null;
+  const avgEntradaStr = avgEntrada == null
+    ? '—'
+    : `${String(Math.floor(avgEntrada / 60)).padStart(2, '0')}:${String(avgEntrada % 60).padStart(2, '0')}`;
+
+  return (
+    <div style={{ padding: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
+        <div className="vale-card" style={{ padding: 14 }}>
+          <div className="vale-stat-label">Horas no mês</div>
+          <div className="tabular" style={{ fontSize: 18, fontWeight: 700, color: 'var(--ink)', marginTop: 4 }}>
+            {minsToHuman(totalMins)}
+          </div>
+        </div>
+        <div className="vale-card" style={{ padding: 14 }}>
+          <div className="vale-stat-label">Faltas</div>
+          <div className="tabular" style={{
+            fontSize: 18, fontWeight: 700,
+            color: monthFaltas > 0 ? 'var(--status-err-dot)' : 'var(--ink)',
+            marginTop: 4
+          }}>
+            {monthFaltas}
+          </div>
+        </div>
+        <div className="vale-card" style={{ padding: 14 }}>
+          <div className="vale-stat-label">Atrasos</div>
+          <div className="tabular" style={{
+            fontSize: 18, fontWeight: 700,
+            color: monthAtrasos > 0 ? 'var(--status-warn-dot)' : 'var(--ink)',
+            marginTop: 4
+          }}>
+            {monthAtrasos}
+          </div>
+        </div>
+        <div className="vale-card" style={{ padding: 14 }}>
+          <div className="vale-stat-label">Entrada média</div>
+          <div className="tabular" style={{ fontSize: 18, fontWeight: 700, color: 'var(--ink)', marginTop: 4 }}>
+            {avgEntradaStr}
+          </div>
+        </div>
+      </div>
+
+      {monthRecs.length === 0 ? (
+        <EmptyState
+          icon={IconCalendar}
+          title="Nenhum ponto registrado neste mês"
+          body="Toque em um dia abaixo para começar a registrar."
+        />
+      ) : null}
+
+      <PontoCalendar
+        employee={employee}
+        ponto={ponto}
+        monthDate={monthDate}
+        onDayClick={(c) => {
+          if (c.kind === 'weekend') return;
+          onDayClick && onDayClick(c.date, c.rec);
+        }}
+      />
+      <PontoCalendarLegend/>
     </div>
   );
 };
