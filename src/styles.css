@@ -1,8 +1,39 @@
-/* Vale management app — global styles */
+/* Vale management app — global styles
+ * DARK is the default theme. Light is opt-in via prefers-color-scheme: light
+ * (or via [data-theme="light"] on <html>). This kills mobile auto-darkening
+ * and keeps the demo branding consistent across devices.
+ */
 :root {
-  color-scheme: light dark;
+  color-scheme: dark;
 
-  /* Light tokens (default) */
+  /* Dark tokens (default) */
+  --primary: #14B8A6;
+  --primary-600: #0D9488;
+  --primary-50: #042F2E;
+  --primary-100: #134E4A;
+  --ink: #F1F5F9;
+  --text: #CBD5E1;
+  --muted: #94A3B8;
+  --subtle: #64748B;
+  --line: #1E293B;
+  --line-soft: #0F172A;
+  --bg: #0B1120;
+  --surface: #111827;
+  --surface-2: #0F1525;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
+}
+
+html { background: #0B1120; }
+
+/* Light theme — opt-in only via [data-theme="light"] on <html>.
+ * For the MVP demo we deliberately do NOT respect prefers-color-scheme: light,
+ * so stakeholders always see the brand dark theme and mobile browsers can't
+ * apply Auto Dark Theme on top of it. A future toggle can flip data-theme.
+ */
+:root[data-theme="light"] {
+  color-scheme: light;
   --primary: #0F766E;
   --primary-600: #0D6963;
   --primary-50: #F0FDFA;
@@ -15,34 +46,10 @@
   --line-soft: #F1F5F9;
   --bg: #F8FAFC;
   --surface: #FFFFFF;
+  --surface-2: #F1F5F9;
   --shadow-sm: 0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
   --shadow-md: 0 4px 12px rgba(15,23,42,0.08);
   --shadow-lg: 0 12px 32px rgba(15,23,42,0.12);
-}
-
-/* Dark theme tokens */
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --primary: #14B8A6;
-    --primary-600: #0D9488;
-    --primary-50: #042F2E;
-    --primary-100: #134E4A;
-    --ink: #F1F5F9;
-    --text: #CBD5E1;
-    --muted: #94A3B8;
-    --subtle: #64748B;
-    --line: #1E293B;
-    --line-soft: #0F172A;
-    --bg: #0B1120;
-    --surface: #111827;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
-    --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
-    --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
-  }
-  html {
-    background: #0B1120;
-  }
 }
 
 * { box-sizing: border-box; }
@@ -516,18 +523,38 @@ input, textarea, select { font-family: inherit; }
 .vale-status-badge.status-blue { background: var(--chip-blue-bg); color: var(--chip-blue-fg); }
 .vale-status-badge.status-red  { background: var(--chip-red-bg);  color: var(--chip-red-fg);  }
 
-/* BubbleNav SVG drop shadow — dark mode aware */
-.bubble-nav-svg {
+/* BubbleNav SVG drop shadow — dark default */
+.bubble-nav-svg { filter: drop-shadow(0 -2px 16px rgba(0,0,0,0.5)); }
+:root[data-theme="light"] .bubble-nav-svg {
   filter: drop-shadow(0 -2px 12px rgba(15,23,42,0.08));
 }
-@media (prefers-color-scheme: dark) {
-  .bubble-nav-svg {
-    filter: drop-shadow(0 -2px 16px rgba(0,0,0,0.5));
-  }
+
+/* Semantic status tokens (chips + status colors) — dark default */
+:root {
+  --chip-warn-bg: #451A03;
+  --chip-warn-fg: #FCD34D;
+  --chip-ok-bg:   #052E16;
+  --chip-ok-fg:   #6EE7B7;
+  --chip-red-bg:  #450A0A;
+  --chip-red-fg:  #FCA5A5;
+  --chip-blue-bg: #1E3A5F;
+  --chip-blue-fg: #93C5FD;
+
+  --status-warn-bg: var(--chip-warn-bg);
+  --status-warn-fg: var(--chip-warn-fg);
+  --status-warn-dot: #F59E0B;
+  --status-ok-bg:   var(--chip-ok-bg);
+  --status-ok-fg:   var(--chip-ok-fg);
+  --status-ok-dot:  #10B981;
+  --status-info-bg: var(--chip-blue-bg);
+  --status-info-fg: var(--chip-blue-fg);
+  --status-info-dot:#3B82F6;
+  --status-err-bg:  var(--chip-red-bg);
+  --status-err-fg:  var(--chip-red-fg);
+  --status-err-dot: #EF4444;
 }
 
-/* Status icon chips — semantic colors adapted for dark */
-:root {
+:root[data-theme="light"] {
   --chip-warn-bg: #FEF3C7;
   --chip-warn-fg: #92400E;
   --chip-ok-bg:   #D1FAE5;
@@ -537,15 +564,236 @@ input, textarea, select { font-family: inherit; }
   --chip-blue-bg: #DBEAFE;
   --chip-blue-fg: #1E40AF;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --chip-warn-bg: #451A03;
-    --chip-warn-fg: #FCD34D;
-    --chip-ok-bg:   #052E16;
-    --chip-ok-fg:   #6EE7B7;
-    --chip-red-bg:  #450A0A;
-    --chip-red-fg:  #FCA5A5;
-    --chip-blue-bg: #1E3A5F;
-    --chip-blue-fg: #93C5FD;
+
+/* ====================================================================
+   Ponto (timesheet) — month picker, calendar grid, progress bar, tabs
+==================================================================== */
+.vale-month-picker {
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px;
+  margin: 8px 0 16px;
+}
+.vale-month-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  text-transform: capitalize;
+  letter-spacing: -0.01em;
+  min-width: 160px;
+  text-align: center;
+}
+
+.vale-progress {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--line-soft);
+  overflow: hidden;
+}
+.vale-progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: inherit;
+  transition: width 320ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* 7-column calendar */
+.vale-cal {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+.vale-cal-head {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--subtle);
+  text-align: center;
+  padding: 4px 0;
+}
+.vale-cal-cell {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  min-height: 44px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 120ms ease, border-color 160ms ease, background 160ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.vale-cal-cell:hover { border-color: var(--subtle); }
+.vale-cal-cell:active { transform: scale(0.97); }
+.vale-cal-cell.empty {
+  background: transparent;
+  border-color: transparent;
+  cursor: default;
+  pointer-events: none;
+}
+.vale-cal-cell.complete {
+  background: var(--status-ok-bg);
+  color: var(--status-ok-fg);
+  border-color: var(--status-ok-bg);
+}
+.vale-cal-cell.partial {
+  background: var(--status-warn-bg);
+  color: var(--status-warn-fg);
+  border-color: var(--status-warn-bg);
+}
+.vale-cal-cell.absent {
+  background: var(--status-err-bg);
+  color: var(--status-err-fg);
+  border-color: var(--status-err-bg);
+}
+.vale-cal-cell.unrecorded {
+  background: var(--surface);
+  color: var(--muted);
+}
+.vale-cal-cell.weekend {
+  background: var(--surface-2);
+  color: var(--subtle);
+  border-color: var(--line);
+  cursor: default;
+}
+.vale-cal-cell.today {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+.vale-cal-cell-hour {
+  font-size: 10px;
+  font-weight: 500;
+  opacity: 0.85;
+  font-variant-numeric: tabular-nums;
+}
+
+.vale-cal-anim {
+  animation: calSlide 280ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+@keyframes calSlide {
+  from { opacity: 0; transform: translateX(var(--cal-dir, 0)); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.vale-cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 0;
+  font-size: 11px;
+  color: var(--muted);
+}
+.vale-cal-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.vale-cal-legend-dot {
+  width: 12px; height: 12px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* Tabs (underline) */
+.vale-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 16px;
+  gap: 4px;
+}
+.vale-tab {
+  flex: 1;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color 160ms ease, border-color 160ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.vale-tab:hover { color: var(--text); }
+.vale-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* Inline error under input */
+.vale-error {
+  font-size: 12px;
+  color: var(--status-err-dot);
+  margin-top: 4px;
+}
+.vale-input.error {
+  border-color: var(--status-err-dot);
+}
+.vale-input.error:focus {
+  border-color: var(--status-err-dot);
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.15);
+}
+
+/* FAB speed-dial */
+.vale-fab-menu {
+  position: fixed;
+  right: 20px;
+  bottom: calc(80px + env(safe-area-inset-bottom, 0));
+  z-index: 35;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+.vale-fab-menu .vale-fab { position: static; right: auto; bottom: auto; }
+.vale-fab-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px 10px 12px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  transform-origin: bottom right;
+  animation: fabActionIn 220ms cubic-bezier(0.32, 0.72, 0, 1) backwards;
+  -webkit-tap-highlight-color: transparent;
+}
+.vale-fab-action:nth-of-type(1) { animation-delay: 0ms; }
+.vale-fab-action:nth-of-type(2) { animation-delay: 60ms; }
+.vale-fab-action-icon {
+  width: 32px; height: 32px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+@keyframes fabActionIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.92); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.vale-fab-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 34;
+  animation: fadeIn 180ms ease;
+}
+@media (min-width: 1024px) {
+  .vale-fab-menu {
+    right: 32px;
+    bottom: 32px;
   }
 }
