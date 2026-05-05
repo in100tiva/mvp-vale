@@ -38,7 +38,7 @@ A gestora consegue **aprovar ou negar pedidos de vale do celular em segundos**, 
 ### Out of Scope (este marco)
 
 - Toggle manual claro/escuro — atual depende só de `prefers-color-scheme`. Decidir em marco futuro.
-- Backend / autenticação — sem mudança.
+- Backend / banco / autenticação — **decisão explícita do usuário (2026-05-05)**: enquanto for MVP demonstrativo, o app fica 100% client-side com dados mockados de `data.js` como seed e persistência em `localStorage` por dispositivo. Backend/auth voltam ao escopo só após a aprovação do MVP pelo stakeholder.
 - Refatoração de componentes — só ajustes de tokens.
 - iOS / Safari Mobile — sem dispositivo de teste; testar se for trivial mas não bloquear o marco.
 
@@ -49,6 +49,7 @@ A gestora consegue **aprovar ou negar pedidos de vale do celular em segundos**, 
 | Manter `prefers-color-scheme` como única fonte do tema | Toggle manual é escopo de produto, não de bug fix. Foco aqui é o que já existe funcionar | — Pending |
 | Não migrar para Tailwind/shadcn neste marco | Bug é de tokens CSS, não de arquitetura de styling. Refator é distração | — Pending |
 | Usar `color-scheme: dark` explícito como sinal canônico para o navegador | Documentação MDN e relatos de campo (Samsung Internet, Chrome 96+) confirmam que essa é a forma de desativar o auto-darkening | — Pending |
+| MVP fica client-side, persistência em `localStorage` (sem backend, sem auth) | Banco ainda não decidido. Para demonstração, dados mockados + persistência local são suficientes para o stakeholder interagir e validar a UX. Backend volta ao escopo após aprovação | — Implemented (Phase 1.1) |
 
 ## Evolution
 

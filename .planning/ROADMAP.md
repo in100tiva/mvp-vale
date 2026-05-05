@@ -16,6 +16,7 @@ Resolver o problema de auto-darkening do Chrome Android / Samsung Internet que e
 | # | Fase | Goal | Requisitos | Critérios de Sucesso |
 |---|------|------|------------|----------------------|
 | 1 | Token-fy & sinalizar dark canônico | Eliminar todos os hardcodes light que vazam em dark e dar ao navegador o sinal canônico para não auto-darkenizar | THEME-01, THEME-02, THEME-03, THEME-05 | 4 |
+| 1.1 | Persistência em localStorage (modo demo) | Permitir que o usuário interaja (criar/aprovar/negar pedidos, cadastrar funcionário) e que as ações sobrevivam a reload, sem backend | DEMO-01, DEMO-02 | 3 |
 | 2 | Validação em mobile real | Confirmar que o fix elimina a discrepância entre DevTools e celular real em ≥ 2 navegadores | THEME-04 | 3 |
 
 ---
@@ -42,6 +43,25 @@ Resolver o problema de auto-darkening do Chrome Android / Samsung Internet que e
 4. `npm run build` passa sem erros e sem warnings de CSS.
 
 **UI hint**: yes (essa fase mexe em estilos visíveis)
+
+---
+
+### Phase 1.1 — Persistência em localStorage (modo demo)
+
+**Goal**: Tornar o MVP genuinamente demonstrável sem backend. Pedidos criados, aprovações/negações e funcionários cadastrados persistem entre reloads no mesmo dispositivo. Sem auth, sem banco — só `localStorage` com seed dos mocks de `data.js` na primeira execução.
+
+**Files in scope:**
+- `src/useLocalStorage.js` — hook reutilizável com lazy init, fallback gracioso (SSR/modo anônimo) e `resetValeStorage()` para limpar tudo
+- `src/App.jsx` — substituir `useState(INITIAL_*)` por `useLocalStorage('employees', …)` e `useLocalStorage('requests', …)`. Adicionar botão "Resetar dados de demonstração" na tela "Eu" (perfil)
+
+**Requisitos cobertos:** DEMO-01, DEMO-02
+
+**Critérios de sucesso:**
+1. Reload da página preserva pedidos novos, mudanças de status e funcionários cadastrados.
+2. Botão de reset na tela de perfil restaura o seed inicial após confirmação (`window.confirm`).
+3. App não quebra em ambientes onde `localStorage` está bloqueado (modo privativo restrito) — cai para in-memory silenciosamente.
+
+**UI hint**: yes (botão de reset visível)
 
 ---
 

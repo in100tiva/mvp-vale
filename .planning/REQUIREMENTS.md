@@ -12,6 +12,11 @@ Marco atual: **v0.1 — Correção de tema escuro em mobile real**
 - [ ] **THEME-04**: Smoke test visual passa em pelo menos 2 dispositivos/navegadores mobile reais — comparado lado a lado com DevTools mobile, sem diferença perceptível.
 - [ ] **THEME-05**: `<meta name="color-scheme">` e `<meta name="theme-color">` declaram corretamente o suporte a dark, e a barra de status do navegador combina com o `--bg` do app.
 
+### Demo Persistence (modo MVP sem backend)
+
+- [ ] **DEMO-01**: Pedidos criados, aprovações/negações e funcionários cadastrados persistem entre reloads do navegador no mesmo dispositivo, sem nenhum backend.
+- [ ] **DEMO-02**: Existe um botão "Resetar dados de demonstração" na tela "Eu" que restaura o seed mockado original após confirmação do usuário.
+
 ### Out of Scope
 
 - **Toggle manual claro/escuro** — produto vai decidir em marco futuro; hoje a fonte é só o `prefers-color-scheme`.
@@ -28,6 +33,8 @@ Marco atual: **v0.1 — Correção de tema escuro em mobile real**
 | THEME-03  | Phase 1 | Active |
 | THEME-04  | Phase 2 | Active |
 | THEME-05  | Phase 1 | Active |
+| DEMO-01   | Phase 1.1 | Active |
+| DEMO-02   | Phase 1.1 | Active |
 
 ---
 *Last updated: 2026-05-04*
