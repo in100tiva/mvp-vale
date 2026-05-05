@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { INITIAL_EMPLOYEES, INITIAL_REQUESTS, TODAY, fmtBRL } from './data.js';
+import { useLocalStorage, resetValeStorage } from './useLocalStorage.js';
 import {
   IconHome, IconList, IconUsers, IconUser, IconPlus,
   IconBell, IconChevronRight, IconCalendar, IconWallet
@@ -18,8 +19,8 @@ const NAV = [
 ];
 
 function AppInner() {
-  const [employees, setEmployees] = useState(INITIAL_EMPLOYEES);
-  const [requests, setRequests] = useState(INITIAL_REQUESTS);
+  const [employees, setEmployees] = useLocalStorage('employees', INITIAL_EMPLOYEES);
+  const [requests, setRequests]   = useLocalStorage('requests',  INITIAL_REQUESTS);
 
   const [route, setRoute] = useState({ name: 'dashboard' });
   const [pedidosFilter, setPedidosFilter] = useState('todos');
@@ -181,6 +182,23 @@ function AppInner() {
                   <IconChevronRight size={18} style={{ color: 'var(--subtle)' }}/>
                 </div>
               ))}
+
+              <div style={{ marginTop: 24, padding: '0 4px' }}>
+                <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>
+                  Modo demonstração — dados salvos só neste dispositivo (localStorage)
+                </div>
+                <button
+                  className="vale-btn vale-btn-ghost vale-btn-block"
+                  onClick={() => {
+                    if (confirm('Resetar todos os dados para o exemplo inicial? Essa ação não pode ser desfeita.')) {
+                      resetValeStorage();
+                      window.location.reload();
+                    }
+                  }}
+                >
+                  Resetar dados de demonstração
+                </button>
+              </div>
             </div>
           )}
         </div>
