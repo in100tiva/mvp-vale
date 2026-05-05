@@ -1,26 +1,33 @@
 import { useState, useEffect } from 'react';
-import { INITIAL_EMPLOYEES, INITIAL_REQUESTS, TODAY, fmtBRL } from './data.js';
+import { INITIAL_EMPLOYEES, INITIAL_REQUESTS, INITIAL_PONTO, TODAY, fmtBRL } from './data.js';
 import { useLocalStorage, resetValeStorage } from './useLocalStorage.js';
 import {
   IconHome, IconList, IconUsers, IconUser, IconPlus,
-  IconBell, IconChevronRight, IconCalendar, IconWallet
+  IconBell, IconChevronRight, IconCalendar, IconWallet, IconClock,
+  IconDollar, IconX
 } from './icons.jsx';
 import { Avatar, Sheet, ToastProvider } from './ui.jsx';
 import { Dashboard, PedidosList, PerfilFuncionario, FuncionariosList } from './screens.jsx';
 import { NovoPedido, NovoFuncionario, RequestDetail } from './forms.jsx';
+import { PontoList, PontoDetail, RegistroPonto } from './ponto.jsx';
 import { BubbleNav } from './BubbleNav.jsx';
 import './styles.css';
 
+// Bottom nav (4 itens). "Eu" sai daqui — fica acessível pelo avatar do topbar.
 const NAV = [
-  { id: 'dashboard',    label: 'Dashboard',    icon: IconHome },
-  { id: 'pedidos',      label: 'Pedidos',      icon: IconList },
-  { id: 'funcionarios', label: 'Equipe',       icon: IconUsers },
-  { id: 'perfil',       label: 'Eu',           icon: IconUser }
+  { id: 'dashboard',    label: 'Home',         icon: IconHome  },
+  { id: 'pedidos',      label: 'Pedidos',      icon: IconList  },
+  { id: 'ponto',        label: 'Ponto',        icon: IconClock },
+  { id: 'funcionarios', label: 'Equipe',       icon: IconUsers }
 ];
+
+// Sidebar desktop ganha "Eu" como último item.
+const SIDEBAR_NAV = [...NAV, { id: 'perfil', label: 'Eu', icon: IconUser }];
 
 function AppInner() {
   const [employees, setEmployees] = useLocalStorage('employees', INITIAL_EMPLOYEES);
   const [requests, setRequests]   = useLocalStorage('requests',  INITIAL_REQUESTS);
+  const [ponto, setPonto]         = useLocalStorage('ponto',     INITIAL_PONTO);
 
   const [route, setRoute] = useState({ name: 'dashboard' });
   const [pedidosFilter, setPedidosFilter] = useState('todos');
@@ -28,6 +35,15 @@ function AppInner() {
   const [novoFuncOpen, setNovoFuncOpen] = useState(false);
   const [detailRequestId, setDetailRequestId] = useState(null);
   const [scrolled, setScrolled] = useState(false);
+  const [fabOpen, setFabOpen] = useState(false);
+
+  // Mês selecionado na lista de Ponto (visão geral)
+  const today = new Date(TODAY);
+  const [pontoMonth, setPontoMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+
+  // Bottom sheet de registro de ponto
+  const [registroPonto, setRegistroPonto] = useState(null);
+  // shape: { employee, date: Date, existing: record|null }
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 4);
@@ -41,15 +57,31 @@ function AppInner() {
     if (name === 'pedidos' && opts.filter) setPedidosFilter(opts.filter);
     else if (name === 'pedidos') setPedidosFilter('todos');
     setRoute({ name });
+    setFabOpen(false);
   };
 
   const openEmployee = (id) => setRoute({ name: 'perfil-emp', employeeId: id });
+  const openPontoEmployee = (id) => setRoute({ name: 'ponto-emp', employeeId: id });
   const openRequest = (id) => setDetailRequestId(id);
 
   const handleSavePedido = (newReq) => setRequests(prev => [newReq, ...prev]);
   const handleSaveFunc = (newEmp) => setEmployees(prev => [...prev, newEmp]);
   const handleUpdateStatus = (rid, status) =>
     setRequests(prev => prev.map(r => r.id === rid ? { ...r, status } : r));
+
+  const handleSavePonto = (rec) => {
+    setPonto(prev => {
+      const idx = prev.findIndex(p => p.employeeId === rec.employeeId && p.date === rec.date);
+      if (idx === -1) return [...prev, rec];
+      const next = [...prev];
+      next[idx] = rec;
+      return next;
+    });
+  };
+
+  const openRegistroPonto = (employee, date, existing) => {
+    setRegistroPonto({ employee, date, existing: existing || null });
+  };
 
   const detailReq = requests.find(r => r.id === detailRequestId);
   const detailEmp = detailReq ? employees.find(e => e.id === detailReq.employeeId) : null;
@@ -58,16 +90,22 @@ function AppInner() {
     if (route.name === 'dashboard') return {
       title: 'Olá, Marina',
       sub: new Date(TODAY).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }),
-      showBell: true
+      showBell: true, showAvatar: true
     };
-    if (route.name === 'pedidos') return { title: 'Pedidos', sub: `${requests.length} no total`, showBell: true };
-    if (route.name === 'funcionarios') return { title: 'Equipe', sub: `${employees.length} funcionários`, showBell: false };
-    if (route.name === 'perfil') return { title: 'Configurações', sub: 'Sua conta', showBell: false };
+    if (route.name === 'pedidos') return { title: 'Pedidos', sub: `${requests.length} no total`, showBell: true, showAvatar: true };
+    if (route.name === 'ponto') return { title: 'Ponto', sub: 'Folha mensal', showBell: false, showAvatar: true };
+    if (route.name === 'funcionarios') return { title: 'Equipe', sub: `${employees.length} funcionários`, showBell: false, showAvatar: true };
+    if (route.name === 'perfil') return { title: 'Configurações', sub: 'Sua conta', showBell: false, showAvatar: false };
     return null;
   })();
 
-  const activeNav = route.name === 'perfil-emp' ? 'funcionarios' : route.name;
-  const showFAB = route.name !== 'perfil-emp' && route.name !== 'perfil';
+  const activeNav = (() => {
+    if (route.name === 'perfil-emp') return 'funcionarios';
+    if (route.name === 'ponto-emp')  return 'ponto';
+    if (route.name === 'perfil')     return null; // não destaca nada na bottom nav
+    return route.name;
+  })();
+  const showFAB = route.name === 'dashboard' || route.name === 'pedidos' || route.name === 'ponto';
 
   return (
     <div className="vale-app">
@@ -80,10 +118,10 @@ function AppInner() {
             <div className="vale-sidebar-org">RH · Acme Ltda</div>
           </div>
         </div>
-        {NAV.map(n => (
+        {SIDEBAR_NAV.map(n => (
           <button key={n.id}
                   onClick={() => goNav(n.id)}
-                  className={`vale-sidebar-item ${activeNav === n.id ? 'active' : ''}`}>
+                  className={`vale-sidebar-item ${activeNav === n.id || route.name === n.id ? 'active' : ''}`}>
             <n.icon size={18}/> {n.label}
           </button>
         ))}
@@ -102,18 +140,27 @@ function AppInner() {
               <h1>{topbar.title}</h1>
               <div className="vale-topbar-sub">{topbar.sub}</div>
             </div>
-            {topbar.showBell && (
-              <button className="vale-icon-btn" aria-label="Notificações">
-                <IconBell size={18}/>
-              </button>
-            )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {topbar.showBell && (
+                <button className="vale-icon-btn" aria-label="Notificações">
+                  <IconBell size={18}/>
+                </button>
+              )}
+              {topbar.showAvatar && (
+                <button onClick={() => goNav('perfil')}
+                        aria-label="Perfil"
+                        style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer' }}>
+                  <Avatar nome="Marina Albuquerque" size={36}/>
+                </button>
+              )}
+            </div>
           </header>
         )}
 
         <div className="vale-content">
           {route.name === 'dashboard' && (
             <Dashboard
-              employees={employees} requests={requests}
+              employees={employees} requests={requests} ponto={ponto}
               onNav={goNav}
               onOpenRequest={openRequest}
               onOpenEmployee={openEmployee}
@@ -127,6 +174,26 @@ function AppInner() {
               onOpenEmployee={openEmployee}
             />
           )}
+          {route.name === 'ponto' && (
+            <PontoList
+              employees={employees} ponto={ponto}
+              currentMonth={pontoMonth}
+              setCurrentMonth={setPontoMonth}
+              onOpenEmployee={openPontoEmployee}
+            />
+          )}
+          {route.name === 'ponto-emp' && (() => {
+            const emp = employees.find(e => e.id === route.employeeId);
+            if (!emp) return null;
+            return (
+              <PontoDetail
+                employee={emp}
+                ponto={ponto}
+                onBack={() => goNav('ponto')}
+                onDayClick={(date, existing) => openRegistroPonto(emp, date, existing)}
+              />
+            );
+          })()}
           {route.name === 'funcionarios' && (
             <FuncionariosList
               employees={employees} requests={requests}
@@ -142,8 +209,10 @@ function AppInner() {
                 employee={emp}
                 employees={employees}
                 requests={requests}
+                ponto={ponto}
                 onBack={() => goNav('funcionarios')}
                 onOpenRequest={openRequest}
+                onDayClick={(date, existing) => openRegistroPonto(emp, date, existing)}
               />
             );
           })()}
@@ -190,7 +259,7 @@ function AppInner() {
                 <button
                   className="vale-btn vale-btn-ghost vale-btn-block"
                   onClick={() => {
-                    if (confirm('Resetar todos os dados para o exemplo inicial? Essa ação não pode ser desfeita.')) {
+                    if (confirm('Resetar todos os dados (vales, ponto, funcionários) para o exemplo inicial? Essa ação não pode ser desfeita.')) {
                       resetValeStorage();
                       window.location.reload();
                     }
@@ -204,11 +273,38 @@ function AppInner() {
         </div>
       </div>
 
-      {showFAB && (
-        <button className="vale-fab" onClick={() => setNovoPedidoOpen(true)}
-                aria-label="Novo pedido">
+      {/* FAB speed-dial: clique abre opções "Novo vale" + "Registrar ponto" */}
+      {showFAB && !fabOpen && (
+        <button className="vale-fab" onClick={() => setFabOpen(true)}
+                aria-label="Ações rápidas">
           <IconPlus size={24} strokeWidth={2.5}/>
         </button>
+      )}
+      {showFAB && fabOpen && (
+        <>
+          <div className="vale-fab-backdrop" onClick={() => setFabOpen(false)}/>
+          <div className="vale-fab-menu">
+            <button className="vale-fab-action" onClick={() => {
+              setFabOpen(false);
+              setNovoPedidoOpen(true);
+            }}>
+              <span className="vale-fab-action-icon"><IconDollar size={18}/></span>
+              Novo vale
+            </button>
+            <button className="vale-fab-action" onClick={() => {
+              setFabOpen(false);
+              if (employees.length > 0) {
+                openRegistroPonto(employees[0], new Date(TODAY), null);
+              }
+            }}>
+              <span className="vale-fab-action-icon"><IconClock size={18}/></span>
+              Registrar ponto
+            </button>
+            <button className="vale-fab" onClick={() => setFabOpen(false)} aria-label="Fechar">
+              <IconX size={24} strokeWidth={2.5}/>
+            </button>
+          </div>
+        </>
       )}
 
       <BubbleNav
@@ -240,6 +336,18 @@ function AppInner() {
           onUpdateStatus={handleUpdateStatus}
           onOpenEmployee={(id) => { setDetailRequestId(null); openEmployee(id); }}
         />
+      </Sheet>
+
+      <Sheet open={!!registroPonto} onClose={() => setRegistroPonto(null)} fullHeight>
+        {registroPonto && (
+          <RegistroPonto
+            employee={registroPonto.employee}
+            date={registroPonto.date}
+            existing={registroPonto.existing}
+            onClose={() => setRegistroPonto(null)}
+            onSave={handleSavePonto}
+          />
+        )}
       </Sheet>
     </div>
   );
