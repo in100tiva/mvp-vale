@@ -1,6 +1,6 @@
 {
   "name": "vale-app",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Gestão de pedidos de adiantamento salarial (vale) mobile-first para pequenas e médias empresas.",
   "license": "MIT",

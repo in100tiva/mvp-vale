@@ -8,11 +8,17 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-3DA639?style=flat-square)](LICENSE)
 ![React 19](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=white)
 ![Vite 8](https://img.shields.io/badge/Vite-8-646CFF?style=flat-square&logo=vite&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES2024-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
 ![Mobile-first](https://img.shields.io/badge/mobile--first-sim-0A66C2?style=flat-square)
+![Vercel](https://img.shields.io/badge/Vercel-deploy%20privado-000000?style=flat-square&logo=vercel&logoColor=white)
 
 > **Em 30 segundos:** app web mobile-first que substitui planilha + WhatsApp no controle de **adiantamento salarial** ("vale"). O colaborador pede pelo celular, o RH aprova em dois toques e o limite de cada pessoa é recalculado na hora. O registro de ponto vive no mesmo app. Construído em **React 19 + Vite 8**, sem UI kit, com persistência local — a camada de API é o próximo passo do [roadmap](#roadmap).
 
-**Demonstração:** https://in100tiva.github.io/mvp-vale/ — build publicado pelo workflow de Pages a cada push em `main`.
+## Demo
+
+**Demo público:** https://in100tiva.github.io/mvp-vale/ — build estático gerado por `npm run build` e publicado pelo workflow `deploy-pages.yml` a cada push em `main`. Funciona no navegador do celular, sem instalação.
+
+O deploy na Vercel (`mvp-vale-in100tivas-projects.vercel.app`) existe como ambiente de preview, mas está com a **proteção de deployment** ativada: sem sessão da Vercel a URL responde com a tela de login, portanto não serve como link público. Quer avaliar o app nesse ambiente? Peça a liberação em uma [issue](https://github.com/in100tiva/mvp-vale/issues) ou para [@in100tiva](https://github.com/in100tiva).
 
 MVP web mobile-first para RH e colaboradores gerenciarem **adiantamentos salariais** e **registro de ponto** em um só lugar: solicitação, aprovação, limite disponível e histórico — sem depender de planilha ou troca de mensagens.
 
@@ -129,7 +135,7 @@ Acompanhe o andamento nas [issues](https://github.com/in100tiva/mvp-vale/issues)
 
 ## Contribuir
 
-Sugestões, correções e melhorias são bem-vindas. Leia o [CONTRIBUTING.md](CONTRIBUTING.md) antes de abrir um pull request e use as [issues](https://github.com/in100tiva/mvp-vale/issues) para discutir mudanças maiores.
+Sugestões, correções e melhorias são bem-vindas. Leia o [CONTRIBUTING.md](CONTRIBUTING.md) e o [Código de Conduta](CODE_OF_CONDUCT.md) antes de abrir um pull request. Use as [issues](https://github.com/in100tiva/mvp-vale/issues) para bugs e tarefas e as [Discussions](https://github.com/in100tiva/mvp-vale/discussions) para dúvidas, ideias e uso do app.
 
 ## Segurança
 

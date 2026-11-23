@@ -28,7 +28,7 @@ Este código vale para issues, pull requests, comentários de código, reviews e
 
 Casos de violação podem ser reportados em privado ao mantenedor, **[@in100tiva](https://github.com/in100tiva)**, por mensagem direta no GitHub. Todas as denúncias serão analisadas com seriedade e confidencialidade; a resposta pode incluir remoção de comentários, fechamento de issues/PRs ou bloqueio da conta, conforme a gravidade.
 
-Falhas de segurança **não** são tratadas por este canal — use o [SECURITY.md](SECURITY.md).
+Falhas de segurança **não** são tratadas por este canal: abra um [security advisory privado](https://github.com/in100tiva/mvp-vale/security/advisories/new), conforme o [SECURITY.md](SECURITY.md).
 
 ## Atribuição
 

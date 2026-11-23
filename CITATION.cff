@@ -12,7 +12,7 @@ authors:
     given-names: "Luan"
     alias: in100tiva
     website: "https://github.com/in100tiva"
-version: 0.1.0
+version: 1.0.0
 date-released: "2026-11-23"
 license: MIT
 repository-code: "https://github.com/in100tiva/mvp-vale"
