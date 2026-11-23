@@ -4,6 +4,7 @@
 [![Deploy](https://img.shields.io/github/actions/workflow/status/in100tiva/mvp-vale/deploy-pages.yml?branch=main&label=deploy&logo=githubpages&style=flat-square)](https://github.com/in100tiva/mvp-vale/actions/workflows/deploy-pages.yml)
 [![Demo](https://img.shields.io/badge/demo-ao%20vivo-2F855A?style=flat-square&logo=githubpages&logoColor=white)](https://in100tiva.github.io/mvp-vale/)
 [![Release](https://img.shields.io/github/v/release/in100tiva/mvp-vale?style=flat-square&label=release)](https://github.com/in100tiva/mvp-vale/releases)
+[![CodeQL](https://img.shields.io/github/actions/workflow/status/in100tiva/mvp-vale/codeql.yml?branch=main&label=CodeQL&logo=github&style=flat-square)](https://github.com/in100tiva/mvp-vale/actions/workflows/codeql.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-3DA639?style=flat-square)](LICENSE)
 ![React 19](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=white)
 ![Vite 8](https://img.shields.io/badge/Vite-8-646CFF?style=flat-square&logo=vite&logoColor=white)
@@ -109,8 +110,12 @@ src/
 
 - **CI** (`ci.yml`): `npm ci` → lint → build em cada push e pull request para `main`.
 - **Deploy contínuo do demo** (`deploy-pages.yml`): publica o build no GitHub Pages.
-- **Dependabot** semanal para npm e GitHub Actions.
+- **CodeQL** (`codeql.yml`): análise estática de segurança em push, pull request e semanal.
+- **Dependency review** (`dependency-review.yml`): bloqueia PR que introduza dependência vulnerável (severidade alta).
+- **OpenSSF Scorecard** (`scorecard.yml`): mede a postura de segurança do repositório e publica o resultado no code scanning.
+- **Dependabot** semanal para npm e GitHub Actions, com PRs agrupados e revisão de segurança.
 - **Análise de segredos** e *push protection* do GitHub habilitados no repositório.
+- **Ruleset da `main`**: PR obrigatório, CI verde, histórico linear, tags `v*` protegidas.
 - **Pull requests** com template e checklist; merges por *squash* com a branch apagada automaticamente.
 
 ## Roadmap

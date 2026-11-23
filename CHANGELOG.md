@@ -6,6 +6,14 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o 
 
 ## [Não publicado]
 
+### Adicionado
+
+- **CodeQL** (`.github/workflows/codeql.yml`): análise estática de segurança em push, pull request e semanal.
+- **Dependency review** (`.github/workflows/dependency-review.yml`): bloqueia pull request que introduza dependência com severidade alta.
+- **OpenSSF Scorecard** (`.github/workflows/scorecard.yml`): mede a postura de segurança e publica o SARIF no code scanning.
+- `CITATION.cff` para citação do projeto.
+- Badge de CodeQL no README e seção "Qualidade e automação" atualizada.
+
 ## [0.1.0] - 2026-11-23
 
 ### Adicionado

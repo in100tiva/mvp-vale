@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "Se você usar este projeto em pesquisa, docência ou produto, cite como abaixo."
+title: "Vale — adiantamento salarial sem planilha"
+abstract: >-
+  Aplicação web mobile-first em React 19 + Vite 8 para gestão de adiantamentos
+  salariais ("vale") e registro de ponto em pequenas equipes: solicitação,
+  aprovação, limite disponível e histórico, com persistência local.
+authors:
+  - family-names: "Oliveira dos Santos"
+    given-names: "Luan"
+    alias: in100tiva
+    website: "https://in100tiva.com/"
+version: 0.1.0
+date-released: "2026-11-23"
+license: MIT
+repository-code: "https://github.com/in100tiva/mvp-vale"
+url: "https://in100tiva.github.io/mvp-vale/"
+keywords:
+  - react
+  - vite
+  - mobile-first
+  - rh
+  - adiantamento-salarial
+  - portfolio
