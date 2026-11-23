@@ -28,6 +28,10 @@ function readKey(key, fallback) {
   }
 }
 
+// Persistência local de dados de demonstração: o app funciona com um seed
+// fictício (nomes e valores inventados) e nada sensível — credenciais, tokens,
+// dados reais de terceiros — passa por aqui. Por isso o storage em texto claro
+// é decisão de projeto do demo, não um descuido.
 function writeKey(key, value) {
   if (typeof window === 'undefined' || !window.localStorage) return;
   try {
