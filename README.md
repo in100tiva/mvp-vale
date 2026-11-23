@@ -27,6 +27,19 @@ Em operações pequenas, adiantamento salarial costuma viver em planilha + Whats
 - **Navegação mobile** (bottom nav) e **sidebar no desktop**
 - Persistência em `localStorage` com opção de reset — ideal para demonstrar o fluxo sem backend
 
+## Fluxo
+
+```mermaid
+flowchart LR
+  C[Colaborador] -->|solicita| P[Pedido de adiantamento]
+  P --> L{Dentro do limite?}
+  L -- não --> R[Recusado]
+  L -- sim --> A[Aprovação do RH]
+  A --> H[Histórico + saldo atualizado]
+  C --> T[Registro de ponto]
+  T --> H
+```
+
 ## Stack
 
 | Camada | Escolha |
