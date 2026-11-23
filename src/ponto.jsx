@@ -7,7 +7,8 @@ import {
 import {
   IconChevronLeft, IconChevronRight, IconCalendar
 } from './icons.jsx';
-import { Avatar, EmptyState, useToast } from './ui.jsx';
+import { Avatar, EmptyState } from './ui.jsx';
+import { useToast } from './toast.js';
 
 // ---------- Lista de Ponto (visão geral) ----------
 export const PontoList = ({ employees, ponto, currentMonth, setCurrentMonth, onOpenEmployee }) => {

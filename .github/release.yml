@@ -1,0 +1,10 @@
+changelog:
+  exclude:
+    labels:
+      - skip-changelog
+    authors:
+      - dependabot
+  categories:
+    - title: Mudanças
+      labels:
+        - "*"

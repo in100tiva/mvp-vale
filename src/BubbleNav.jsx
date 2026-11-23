@@ -53,6 +53,9 @@ export function BubbleNav({ activeId, items, onNav }) {
   }, [W, live]);
 
   // Cross-fade: esconde ícone → troca → mostra (no meio da viagem da bolha)
+  // Este efeito orquestra a animação (e não deriva props/estado), por isso a
+  // regra react-hooks/set-state-in-effect fica desativada aqui de propósito.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!live) { setDisplayId(activeId); return; }
     setIconVisible(false);
@@ -62,6 +65,7 @@ export function BubbleNav({ activeId, items, onNav }) {
     }, 180);
     return () => clearTimeout(t);
   }, [activeId]); // eslint-disable-line react-hooks/exhaustive-deps
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const activeIndex = items.findIndex(i => i.id === activeId);
   const tabW = W > 0 ? W / items.length : 0;

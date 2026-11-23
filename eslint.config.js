@@ -5,9 +5,12 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // `dist` é artefato de build; `.claude` é o kit de ferramentas pessoal
+  // (gerado pelo kit-mcp, roda em Node/CommonJS e não faz parte do app).
+  globalIgnores(['dist', '.claude']),
   {
-    files: ['**/*.{js,jsx}'],
+    // Código do app: roda no navegador.
+    files: ['src/**/*.{js,jsx}'],
     extends: [
       js.configs.recommended,
       reactHooks.configs.flat.recommended,
@@ -17,5 +20,10 @@ export default defineConfig([
       globals: globals.browser,
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
+  },
+  {
+    // Arquivos de configuração: rodam no Node (process, etc.).
+    files: ['*.config.js'],
+    languageOptions: { globals: globals.node },
   },
 ])

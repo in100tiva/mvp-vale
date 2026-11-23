@@ -9,7 +9,8 @@ import {
   IconSearch, IconRefresh, IconPlus, IconAlert, IconArrowUp, IconArrowDown,
   IconCalendar
 } from './icons.jsx';
-import { Avatar, StatusBadge, EmptyState, FreqDot, useToast } from './ui.jsx';
+import { Avatar, StatusBadge, EmptyState, FreqDot } from './ui.jsx';
+import { useToast } from './toast.js';
 import { PontoCalendar, PontoCalendarLegend } from './ponto.jsx';
 
 // ---------- Dashboard ----------
@@ -299,6 +300,9 @@ export const Dashboard = ({ employees, requests, ponto = [], onNav, onOpenReques
 };
 
 // ---------- Pedidos list ----------
+// Início do mês considerado pelo filtro "Este mês" (dados de demonstração).
+const MES_ATUAL_INICIO = new Date(2026, 4, 1);
+
 const FILTERS = [
   { id: 'todos',     label: 'Todos' },
   { id: 'pendentes', label: 'Pendentes' },
@@ -313,14 +317,13 @@ export const PedidosList = ({ employees, requests, initialFilter = 'todos', onOp
   const [refreshing, setRefreshing] = useState(false);
   const toast = useToast();
 
-  const monthStart = new Date(2026, 4, 1);
   const filtered = useMemo(() => {
     let r = [...requests].sort((a, b) => new Date(b.data) - new Date(a.data));
     if (filter === 'pendentes') r = r.filter(x => x.status === 'pendente');
     if (filter === 'aprovados') r = r.filter(x => x.status === 'aprovado' || x.status === 'pago');
     if (filter === 'pago')      r = r.filter(x => x.status === 'pago');
     if (filter === 'negado')    r = r.filter(x => x.status === 'negado');
-    if (filter === 'mes')       r = r.filter(x => new Date(x.data) >= monthStart);
+    if (filter === 'mes')       r = r.filter(x => new Date(x.data) >= MES_ATUAL_INICIO);
     return r;
   }, [requests, filter]);
 

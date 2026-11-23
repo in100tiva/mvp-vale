@@ -1,0 +1,68 @@
+name: Relatar um bug
+description: Algo não funcionou como esperado no app
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por ajudar a melhorar o Vale! Quanto mais contexto, mais rápido conseguimos corrigir.
+
+        Para falhas de **segurança**, não use este formulário: siga o [SECURITY.md](../blob/main/SECURITY.md).
+
+  - type: textarea
+    id: descricao
+    attributes:
+      label: O que aconteceu
+      description: Descreva o comportamento observado, sem julgamentos de causa.
+      placeholder: Ao aprovar um pedido, o limite do colaborador não foi atualizado.
+    validations:
+      required: true
+
+  - type: textarea
+    id: esperado
+    attributes:
+      label: O que era esperado
+      placeholder: O limite deveria diminuir no mesmo instante.
+    validations:
+      required: true
+
+  - type: textarea
+    id: passos
+    attributes:
+      label: Como reproduzir
+      description: Lista numerada de passos. Inclua a tela onde o problema aparece.
+      placeholder: |
+        1. Abrir o app
+        2. Ir em Pedidos
+        3. Criar um pedido de R$ 200
+        4. Aprovar como RH
+        5. Voltar ao Dashboard
+    validations:
+      required: true
+
+  - type: input
+    id: ambiente
+    attributes:
+      label: Navegador e dispositivo
+      description: Ex. Chrome 143 no Android, Safari no iPhone 15, Firefox no desktop.
+    validations:
+      required: true
+
+  - type: textarea
+    id: extras
+    attributes:
+      label: Contexto adicional
+      description: Prints, erros do console, versão do commit ou qualquer outra pista.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checagens
+    attributes:
+      label: Checklist
+      options:
+        - label: Procurei nas issues abertas e não encontrei duplicata
+          required: true
+        - label: Consigo reproduzir o problema de forma consistente
+          required: false

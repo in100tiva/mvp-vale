@@ -1,0 +1,55 @@
+name: Sugerir uma melhoria
+description: Proposta de funcionalidade, ajuste de UX ou melhoria técnica
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Antes de abrir, confira o [Roadmap](../blob/main/README.md#roadmap) — sua ideia pode já estar planejada.
+
+  - type: textarea
+    id: problema
+    attributes:
+      label: Qual problema isso resolve
+      description: Descreva a dor do usuário, não a solução.
+      placeholder: O RH não consegue ver todos os pedidos pendentes de um setor de uma vez.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposta
+    attributes:
+      label: Solução proposta
+      placeholder: Um filtro por setor na tela de Pedidos, combinável com o filtro de status.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternativas
+    attributes:
+      label: Alternativas consideradas
+      description: O que mais você pensou e por que não serve.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: escopo
+    attributes:
+      label: Tipo de mudança
+      options:
+        - Funcionalidade nova
+        - Melhoria de UX / visual
+        - Refatoração / dívida técnica
+        - Documentação
+        - Outro
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checagens
+    attributes:
+      label: Checklist
+      options:
+        - label: Procurei nas issues abertas e não encontrei proposta parecida
+          required: true

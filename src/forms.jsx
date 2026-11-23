@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { TODAY, fmtBRL, fmtDateLong, SETORES, CARGOS, STATUS_META } from './data.js';
+import { TODAY, fmtBRL, fmtDateLong, SETORES, CARGOS } from './data.js';
 import {
   IconChevronLeft, IconChevronRight, IconX, IconCheck, IconSearch,
-  IconUsers, IconSparkles, IconBell, IconCalendar, IconWallet
+  IconUsers, IconSparkles
 } from './icons.jsx';
-import { Avatar, StatusBadge, EmptyState, useToast } from './ui.jsx';
+import { Avatar, StatusBadge, EmptyState } from './ui.jsx';
+import { useToast } from './toast.js';
 
 // Currency input with BRL mask
 const CurrencyInput = ({ value, onChange, autoFocus }) => {
@@ -103,7 +104,7 @@ export const NovoPedido = ({ employees, onClose, onSave, prefilledEmployeeId }) 
   const handlePadPress = (k) => {
     const cents = Math.round(valor * 100);
     if (k === '⌫') setValor(Math.floor(cents / 10) / 100);
-    else if (k === '.') {}
+    else if (k === '.') { /* separador decimal: o teclado só aceita dígitos */ }
     else {
       const next = cents * 10 + parseInt(k, 10);
       if (next > 99999999) return;
@@ -327,9 +328,11 @@ export const NovoFuncionario = ({ onClose, onSave }) => {
   const [saving, setSaving] = useState(false);
   const toast = useToast();
 
-  useEffect(() => {
-    setCargo(CARGOS[setor][0]);
-  }, [setor]);
+  // Trocar de setor redefine o cargo para o primeiro cargo do setor escolhido.
+  const handleSetor = (s) => {
+    setSetor(s);
+    setCargo(CARGOS[s][0]);
+  };
 
   const canSave = nome.trim().length >= 2;
 
@@ -387,7 +390,7 @@ export const NovoFuncionario = ({ onClose, onSave }) => {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
               {SETORES.map(s => (
                 <button key={s}
-                        onClick={() => setSetor(s)}
+                        onClick={() => handleSetor(s)}
                         className="vale-chip"
                         style={{
                           padding: '10px 8px', fontSize: 12,

@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { avatarUrl, STATUS_META } from './data.js';
 import { IconX, IconCheck, IconInbox } from './icons.jsx';
+import { ToastContext } from './toast.js';
 
 export const Avatar = ({ nome, size = 40, ring = false }) => (
   <div
@@ -33,9 +34,6 @@ export const StatusBadge = ({ status, size = 'md' }) => {
 };
 
 // Toast system
-export const ToastContext = createContext(null);
-export const useToast = () => useContext(ToastContext);
-
 export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
   const push = useCallback((msg, type = 'success') => {
