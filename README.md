@@ -1,16 +1,83 @@
-# React + Vite
+# Vale — adiantamento salarial sem planilha
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[![License: MIT](https://img.shields.io/badge/license-MIT-3DA639?style=flat-square)](LICENSE)
+![React 19](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=white)
+![Vite 8](https://img.shields.io/badge/Vite-8-646CFF?style=flat-square&logo=vite&logoColor=white)
+![Mobile-first](https://img.shields.io/badge/mobile--first-sim-0A66C2?style=flat-square)
 
-Currently, two official plugins are available:
+MVP web mobile-first para RH e colaboradores gerenciarem **adiantamentos salariais** e **registro de ponto** em um só lugar: solicitação, aprovação, limite disponível e histórico — sem depender de planilha ou troca de mensagens.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+> Projeto de portfólio: front-end completo, persistência local e fluxo de aprovação. A camada de API é o próximo passo natural (ver [Roadmap](#roadmap)).
 
-## React Compiler
+## O problema
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Em operações pequenas, adiantamento salarial costuma viver em planilha + WhatsApp: o colaborador pede, o RH confere o limite, alguém aprova e o histórico se perde. O Vale modela esse fluxo como produto:
 
-## Expanding the ESLint configuration
+- **Colaborador** vê quanto já adiantou, quanto ainda pode pedir e o status de cada solicitação.
+- **RH** vê a fila de pedidos, aprova ou recusa e acompanha o impacto no limite.
+- **Ponto** fica no mesmo app, evitando dois sistemas para a mesma rotina.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Funcionalidades
+
+- **Dashboard** com saldo, limite e últimos pedidos
+- **Pedidos de adiantamento**: criação, detalhe e mudança de status
+- **Aprovação pelo RH** com histórico por colaborador
+- **Registro de ponto** e espelho de horas
+- **Equipe**: cadastro e perfil de cada colaborador
+- **Navegação mobile** (bottom nav) e **sidebar no desktop**
+- Persistência em `localStorage` com opção de reset — ideal para demonstrar o fluxo sem backend
+
+## Stack
+
+| Camada | Escolha |
+|---|---|
+| UI | React 19 + JSX |
+| Build/dev | Vite 8 |
+| Estilo | CSS próprio, mobile-first |
+| Estado | `useState` + hooks de persistência (`useLocalStorage`) |
+| Dados | Mock estruturado em `src/data.js` |
+
+Sem biblioteca de estado, router ou UI kit: o objetivo era manter o MVP leve e legível.
+
+## Rodando localmente
+
+```bash
+npm install
+npm run dev      # http://localhost:5173
+npm run build    # build de produção
+npm run preview  # serve o build
+```
+
+Requisitos: Node.js 18+.
+
+## Estrutura
+
+```text
+src/
+├── App.jsx            # shell, navegação e composição das telas
+├── screens.jsx        # dashboard, pedidos, equipe, perfil
+├── forms.jsx          # novo pedido, novo funcionário, detalhe/aprovação
+├── ponto.jsx          # registro e espelho de ponto
+├── ui.jsx             # componentes base (avatar, sheet, toast)
+├── icons.jsx          # ícones em SVG
+├── data.js            # dados iniciais e helpers (moeda, datas)
+├── useLocalStorage.js # persistência e reset
+└── styles.css         # design mobile-first
+```
+
+## Decisões de projeto
+
+- **Persistência local em vez de backend** para validar o fluxo com usuários antes de investir em API.
+- **Dados isolados em `data.js`** para trocar mock por chamadas HTTP sem reescrever as telas.
+- **Componentes de formulário separados das telas** para o fluxo de aprovação não virar um componente gigante.
+
+## Roadmap
+
+- [ ] API REST + PostgreSQL (pedidos, limites, ponto)
+- [ ] Autenticação e papéis (colaborador / RH)
+- [ ] Testes de fluxo (Vitest + Testing Library)
+- [ ] Exportação de espelho de ponto (PDF/CSV)
+
+## Licença
+
+[MIT](LICENSE) © Luan Oliveira dos Santos
