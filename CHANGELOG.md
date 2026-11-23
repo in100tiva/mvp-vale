@@ -14,6 +14,10 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o 
 - `CITATION.cff` para citação do projeto.
 - Badge de CodeQL no README e seção "Qualidade e automação" atualizada.
 
+### Alterado
+
+- Ações do GitHub fixadas por SHA (commit imutável) em todos os workflows, reduzindo o risco de supply chain.
+
 ## [0.1.0] - 2026-11-23
 
 ### Adicionado
